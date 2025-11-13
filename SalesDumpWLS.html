@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Dump WLS</title>
+<style>
+/* Root Variables for Light and Dark Mode */
+:root {
+    --primary-color-light: #66CC00;
+    --primary-color-dark: #6A5ACD;
+    --header-bg-dark: rgba(36, 37, 38, 0.8);
+    --button-bg-light: #66CC00;
+    --button-bg-dark: #6A5ACD;
+    --button-hover-light: #55aa00;
+    --button-hover-dark: #5948b5;
+    --text-color-light: #333333;
+    --text-color-dark: #f0f0f0;
+    --modal-bg-light: #ffffff;
+    --modal-bg-dark: #363636;
+    --row-hover-light: rgba(102, 204, 0, 0.1);
+    --row-hover-dark: rgba(106, 90, 205, 0.1);
+    --border-color-light: #e0e0e0;
+    --border-color-dark: #4a4a4a;
+    --background-color-light: #f5f5f5;
+    --background-color-dark: #2c2c2c;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color-light);
+    color: var(--text-color-light);
+    transition: all 0.3s ease;
+    line-height: 1.6;
+}
+
+body.dark {
+    background-color: var(--background-color-dark);
+    color: var(--text-color-dark);
+}
+
+/* Table Container for Infinite Scroll */
+.table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 800px;
+}
+
+/* Fixed Header */
+thead th {
+    position: sticky;
+    top: 40px;
+    background-color: var(--primary-color-light);
+    padding: 12px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    font-weight: 600;
+    z-index: 50;
+}
+
+body.dark thead th {
+    background-color: var(--primary-color-dark);
+    color: var(--text-color-dark);
+}
+
+/* Row Styling */
+tbody tr {
+    border-bottom: 1px solid var(--border-color-light);
+    transition: background-color 0.3s ease;
+}
+
+tbody tr:hover {
+    background-color: var(--row-hover-light);
+}
+
+body.dark tbody tr {
+    border-bottom: 1px solid var(--border-color-dark);
+}
+
+body.dark tbody tr:hover {
+    background-color: var(--row-hover-dark);
+}
+
+tbody td {
+    padding: 12px;
+    font-size: 14px;
+}
+
+/* Filter Buttons */
+.filter-buttons-WLS {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.filter-buttons-WLS button {
+    padding: 10px 20px;
+    background-color: var(--button-bg-light);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.dark .filter-buttons-WLS button {
+    background-color: var(--button-bg-dark);
+}
+
+.filter-buttons-WLS button:hover {
+    background-color: var(--button-hover-light);
+    transform: translateY(-2px);
+}
+
+body.dark .filter-buttons-WLS button:hover {
+    background-color: var(--button-hover-dark);
+}
+
+/* Modal Styles */
+#formModalWLS.modal,
+#summaryModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+#formModalWLS .modal-content,
+#summaryModal .modal-content {
+    background-color: var(--modal-bg-light);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 1000px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+body.dark #formModalWLS .modal-content,
+body.dark #summaryModal .modal-content {
+    background-color: var(--modal-bg-dark);
+    color: var(--text-color-dark);
+}
+
+#formModalWLS .closeModal {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 24px;
+    color: var(--text-color-light);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+body.dark #formModalWLS .closeModal {
+    color: var(--text-color-dark);
+}
+
+#formModalWLS .closeModal:hover {
+    color: var(--primary-color-light);
+}
+
+body.dark #formModalWLS .closeModal:hover {
+    color: var(--primary-color-dark);
+}
+
+#formModalWLS .info-section {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+#formModalWLS .info-group {
+    width: 50%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+#formModalWLS .info-group label {
+    font-weight: bold;
+    color: var(--primary-color-light);
+}
+
+body.dark #formModalWLS .info-group label {
+    color: var(--primary-color-dark);
+}
+
+#formModalWLS .question-section {
+    margin-bottom: 20px;
+}
+
+#formModalWLS .question-group {
+    margin-bottom: 15px;
+}
+
+#formModalWLS .question-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+#formModalWLS input[type="text"],
+#formModalWLS input[type="date"],
+#formModalWLS select,
+#formModalWLS textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color-light);
+    border-radius: 4px;
+    background-color: var(--background-color-light);
+    color: var(--text-color-light);
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#formModalWLS select:focus,
+#formModalWLS input:focus,
+#formModalWLS textarea:focus {
+    border-color: var(--primary-color-light);
+    box-shadow: 0 0 5px rgba(102, 204, 0, 0.3);
+    outline: none;
+}
+
+body.dark #formModalWLS select:focus,
+body.dark #formModalWLS input:focus,
+body.dark #formModalWLS textarea:focus {
+    border-color: var(--primary-color-dark);
+    box-shadow: 0 0 5px rgba(106, 90, 205, 0.3);
+}
+
+/* Smooth transitions for conditional sections */
+.question-section {
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+.question-section[style*="display: none"] {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+/* Eval button styling */
+.eval-btn {
+    background-color: var(--button-bg-light);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.eval-btn:hover {
+    background-color: var(--button-hover-light);
+    transform: translateY(-1px);
+}
+
+body.dark .eval-btn {
+    background-color: var(--button-bg-dark);
+}
+
+body.dark .eval-btn:hover {
+    background-color: var(--button-hover-dark);
+}
+
+body.dark #formModalWLS input[type="text"],
+body.dark #formModalWLS input[type="date"],
+body.dark #formModalWLS select,
+body.dark #formModalWLS textarea {
+    border-color: var(--border-color-dark);
+    background-color: var(--background-color-dark);
+    color: var(--text-color-dark);
+}
+
+#formModalWLS .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#formModalWLS .checkbox-item {
+    display: flex;
+    align-items: center;
+}
+
+#formModalWLS .checkbox-item input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+#formModalWLS .actionsWLS {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background-color: var(--modal-bg-light);
+    border-top: 1px solid var(--border-color-light);
+    position: sticky;
+    bottom: 0;
+}
+
+body.dark #formModalWLS .actionsWLS {
+    background-color: var(--modal-bg-dark);
+    border-top-color: var(--border-color-dark);
+}
+
+#formModalWLS .actionsWLS button,
+#summaryModal .back-summary,
+#summaryModal .close-summary {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s;
+    min-width: 100px;
+}
+
+#formModalWLS .actionsWLS .submitWLS,
+#summaryModal .back-summary {
+    background-color: var(--button-bg-light);
+    color: white;
+}
+
+#formModalWLS .actionsWLS .clearWLS,
+#summaryModal .close-summary {
+    background-color: #f44336;
+    color: white;
+}
+
+body.dark #formModalWLS .actionsWLS .submitWLS,
+body.dark #summaryModal .back-summary {
+    background-color: var(--button-bg-dark);
+}
+
+body.dark #formModalWLS .actionsWLS .clearWLS,
+body.dark #summaryModal .close-summary {
+    background-color: #d32f2f;
+}
+
+#formModalWLS .actionsWLS button:hover,
+#summaryModal .back-summary:hover,
+#summaryModal .close-summary:hover {
+    transform: translateY(-2px);
+}
+
+/* Summary Modal Styles */
+#summaryContent {
+    background-color: var(--background-color-light);
+    border: 1px solid var(--border-color-light);
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+body.dark #summaryContent {
+    background-color: var(--background-color-dark);
+    border-color: var(--border-color-dark);
+}
+
+#summaryContent h3 {
+    color: var(--primary-color-light);
+    margin-bottom: 15px;
+}
+
+body.dark #summaryContent h3 {
+    color: var(--primary-color-dark);
+}
+
+#summaryContent strong {
+    color: var(--text-color-light);
+}
+
+body.dark #summaryContent strong {
+    color: var(--text-color-dark);
+}
+
+/* Button Container Styles */
+#summaryContent > div:last-child {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    margin-top: 20px;
+    border-top: 1px solid var(--border-color-light);
+}
+
+body.dark #summaryContent > div:last-child {
+    border-top-color: var(--border-color-dark);
+}
+
+/* Button Styles */
+#summaryContent .back-summary,
+#summaryContent .close-summary {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s;
+    min-width: 100px;
+    color: white;
+}
+
+#summaryContent .back-summary {
+    background-color: var(--button-bg-light);
+}
+
+#summaryContent .close-summary {
+    background-color: #f44336;
+}
+
+body.dark #summaryContent .back-summary {
+    background-color: var(--button-bg-dark);
+}
+
+body.dark #summaryContent .close-summary {
+    background-color: #d32f2f;
+}
+
+#summaryContent .back-summary:hover,
+#summaryContent .close-summary:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #summaryContent > div:last-child {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #summaryContent .back-summary,
+    #summaryContent .close-summary {
+        width: 100%;
+    }
+}
+.table-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--panel-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.table-loader .container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.table-loader .preloader {
+    animation: rotate 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes rotate {
+    50% {
+        transform: rotate(360deg);
+    }
+    100% {
+        transform: rotate(720deg);
+    }
+}
+
+.preloader span {
+    position: absolute;
+    display: block;
+    height: 64px;
+    width: 64px;
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 100%;
+}
+
+.preloader span:nth-child(1) {
+    transform: translate(-28px, -28px);
+    animation: shape_1 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes shape_1 {
+    60% {
+        transform: scale(0.4);
+    }
+}
+
+.preloader span:nth-child(2) {
+    transform: translate(28px, -28px);
+    animation: shape_2 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes shape_2 {
+    40% {
+        transform: scale(0.4);
+    }
+}
+
+.preloader span:nth-child(3) {
+    position: relative;
+    border-radius: 0px;
+    transform: scale(0.98) rotate(-45deg);
+    animation: shape_3 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes shape_3 {
+    50% {
+        border-radius: 100%;
+        transform: scale(0.5) rotate(-45deg);
+    }
+    100% {
+        transform: scale(0.98) rotate(-45deg);
+    }
+}
+
+.shadow {
+    position: relative;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: block;
+    height: 16px;
+    width: 64px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    border: 1px solid var(--border-color);
+    animation: shadow 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes shadow {
+    50% {
+        transform: translateX(-50%) scale(0.5);
+        opacity: 0.5;
+    }
+}
+
+.table-loader .loader-text {
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Dark mode adjustments */
+body.dark .preloader span {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+body.dark .shadow {
+    background-color: var(--border-color);
+    border-color: var(--border-color);
+    opacity: 0.3;
+}
+.eval-form-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--panel-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+
+.progress-bar {
+    width: 80%;
+    height: 10px;
+    background-color: var(--border-color);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress {
+    width: 0;
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease-out;
+}
+
+.eval-form-loader .loader-text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-color);
+}
+</style>
+
+</head>
+<body>
+<div class="sales-dump-wls">
+
+<div id="tableLoader" class="table-loader">
+    <div class="container">
+        <div class="preloader">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="shadow"></div>
+    </div>
+    <div class="loader-text">Loading Sales Data...</div>
+</div>
+    <div class="overview">
+    <div class="title">
+        <i class="fas fa-dumpster"></i>
+        <span class="text">Sales Dump WLS</span>
+    </div>
+
+        <div class="search-container" style="margin-bottom: 15px;">
+            <input type="text" id="searchInputWLS" placeholder="Search by Agent Name, xID, BAN, Phone Number..." style="width: 300px; padding: 10px; border: 1px solid var(--border-color-light); border-radius: 5px; font-size: 14px;">
+        </div>
+
+        <div class="filter-buttons-WLS">
+            <button data-category="ALL" class="active">All</button>
+            <button data-category="KOODO_ADD_A_LINE">Koodo Add A Line</button>
+            <button data-category="KOODO_UPSELL">Koodo Upsell</button>
+            <button data-category="WIRELESS_ACQUISITION">Wireless Acquisition</button>
+            <button data-category="WIRELESS_RENEWAL">Wireless Renewal</button>
+            <button id="dataSourceToggleWLS">Backlogs</button>
+        </div>
+
+        <table id="salesTableWLS">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+<!-- Modal Structure -->
+<div id="formModalWLS" class="modal">
+    <div class="modal-content">
+      <div id="evalFormLoader" class="eval-form-loader">
+    <div class="progress-bar">
+        <div class="progress"></div>
+    </div>
+    <div class="loader-text">Loading Eval Form...</div>
+</div>
+        <span class="closeModal">&times;</span>
+        <form id="evalFormWLS">
+            <!-- Pre-populated Information Section -->
+            <div class="info-section">
+                <div class="info-group">
+                    <label>Date Validated:</label>
+                    <span id="dateValidatedWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Sale Date:</label>
+                    <span id="saleDateWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>xID:</label>
+                    <span id="xIDWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Agent Name:</label>
+                    <span id="agentName"></span>
+                </div>
+                <div class="info-group">
+                    <label>BAN:</label>
+                    <span id="banWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Phone Number:</label>
+                    <span id="phoneNumberWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Sold BAN:</label>
+                    <span id="soldBANWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Sold Phone:</label>
+                    <span id="soldPhoneWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>CSS Portfolio:</label>
+                    <span id="cssPortfolioWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Product ID:</label>
+                    <span id="productIDWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Order ID:</label>
+                    <span id="orderIDWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Due Date:</label>
+                    <span id="dueDateWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Multiple Sales:</label>
+                    <span id="multipleSalesWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>Number of Sales:</label>
+                    <span id="numberOfSalesWLS"></span>
+                </div>
+                <div class="info-group">
+                    <label>SV Name:</label>
+                    <span id="svNameWLS"></span>
+                </div>
+            </div>
+
+            <!-- Questionnaires Section -->
+            <!-- Page 1: Call Disposition -->
+            <div id="page1" class="question-section">
+                <h3>Choose Call Disposition</h3>
+                <div class="question-group">
+                    <label for="callDisposition">Call Disposition:</label>
+                    <select id="callDisposition" name="callDisposition">
+                        <option value="">-- Select Disposition --</option>
+                        <option value="Good Sale - No AoO">Good Sale - No AoO</option>
+                        <option value="Good Sale with AoO">Good Sale with AoO</option>
+                        <option value="Non-fallout Potential- Error Correction completed by Verifier">Non-fallout Potential- Error Correction completed by Verifier</option>
+                        <option value="Fall-out Potential - Error Correction Completed by Verifier">Fall-out Potential - Error Correction Completed by Verifier</option>
+                        <option value="Fall-out Potential - Order Entry (Failed to Process the Order)">Fall-out Potential - Order Entry (Failed to Process the Order)</option>
+                        <option value="Fall-out Potential - Invalid Disposition Code - Wrong Product Code">Fall-out Potential - Invalid Disposition Code - Wrong Product Code</option>
+                        <option value="Fall-out Potential - Invalid Disposition Code - No Product Code">Fall-out Potential - Invalid Disposition Code - No Product Code</option>
+                        <option value="Fall-out Potential - Error Correction Requires Call back">Fall-out Potential - Error Correction Requires Call back</option>
+                        <option value="Fall-out Potential - Error Correction Completed by Verifier">Fall-out Potential - Error Correction Completed by Verifier</option>
+                        <option value="Fall-out Potential - Professionalism Issue">Fall-out Potential- Professionalism Issue</option>
+                    </select>
+                </div>
+
+<!-- Good Sale Remarks Section (conditional) -->
+<div id="remarksSection" class="question-group" style="display:none;">
+    <label id="remarksLabel" for="goodSaleRemarks">Remarks:</label>
+    <textarea id="goodSaleRemarks" name="goodSaleRemarks" rows="4" style="width: 100%;"></textarea>
+</div>
+
+
+
+            <!-- Page 2: Flags -->
+            <div id="page2" class="question-section" style="display:none;">
+                <h3>Flags</h3>
+                <div class="question-group">
+                    <label>Choose all that apply to the flag (multiple choice):</label>
+
+                    <!-- Regulatory -->
+                    <div>
+                        <h4>Regulatory</h4>
+                        <input type="checkbox" name="flags" value="Identify right party contact"> Identify right party contact<br>
+                        <input type="checkbox" name="flags" value="Provided agent name"> Provided agent name<br>
+                        <input type="checkbox" name="flags" value="Calling from TELUS"> Calling from TELUS<br>
+                        <input type="checkbox" name="flags" value="DNC Process"> DNC Process<br>
+                        <input type="checkbox" name="flags" value="Correct release code"> Correct release code<br>
+                        <input type="checkbox" name="flags" value="Ask existing customer for phone number prior to transferring"> Ask existing customer for phone number prior to transferring<br>
+                    </div>
+
+                    <!-- Privacy -->
+                    <div>
+                        <h4>Privacy</h4>
+                        <input type="checkbox" name="flags" value="Recording statement"> Recording statement<br>
+                        <input type="checkbox" name="flags" value="Recording statement after discovery"> Recording statement after discovery<br>
+                        <input type="checkbox" name="flags" value="Do not provide XID"> Do not provide XID<br>
+                        <input type="checkbox" name="flags" value="Do not provide Last Name"> Do not provide Last Name<br>
+                        <input type="checkbox" name="flags" value="Do not provide manager last name"> Do not provide manager last name<br>
+                        <input type="checkbox" name="flags" value="Authenticate account properly"> Authenticate account properly (gather/verify all required information)<br>
+                        <input type="checkbox" name="flags" value="Authenticate account"> Authenticate account<br>
+                    </div>
+
+                    <!-- Price Information -->
+                    <div>
+                        <h4>Price Information</h4>
+                        <input type="checkbox" name="flags" value="Monthly rate plan cost"> Monthly rate plan cost<br>
+                        <input type="checkbox" name="flags" value="Easy payment"> Easy payment<br>
+                        <input type="checkbox" name="flags" value="Upfront taxes"> Upfront taxes<br>
+                        <input type="checkbox" name="flags" value="Partial month billing"> Partial month billing<br>
+                        <input type="checkbox" name="flags" value="Set regular/promotional price expectations"> Set regular/promotional price expectations<br>
+                        <input type="checkbox" name="flags" value="Connection fees"> Connection fees (did not mention, offered to waive)<br>
+                    </div>
+
+                    <!-- Plan Information -->
+                    <div>
+                        <h4>Plan Information</h4>
+                        <input type="checkbox" name="flags" value="Plan name"> Plan name<br>
+                        <input type="checkbox" name="flags" value="Product features"> Product features<br>
+                        <input type="checkbox" name="flags" value="Equipment/device information"> Equipment/device information<br>
+                        <input type="checkbox" name="flags" value="Service term or length"> Service term or length<br>
+                        <input type="checkbox" name="flags" value="Data and long distance allotment"> Data and long distance allotment and conditions<br>
+                        <input type="checkbox" name="flags" value="Gift with purchase"> Gift with purchase (if applicable)<br>
+                    </div>
+
+                    <!-- Order Processing -->
+                    <div>
+                        <h4>Order Processing</h4>
+                        <input type="checkbox" name="flags" value="Billing and shipping address should match"> Billing and shipping address should match<br>
+                        <input type="checkbox" name="flags" value="Do not provision an expired plan/offer"> Do not provision an expired plan/offer<br>
+                        <input type="checkbox" name="flags" value="Select the right device"> Select the right device<br>
+                        <input type="checkbox" name="flags" value="Select the right plan/products"> Select the right plan/products<br>
+                        <input type="checkbox" name="flags" value="Place an order"> Place an order<br>
+                        <input type="checkbox" name="flags" value="Confirm the customer’s full name"> Confirm the customer’s full name<br>
+                        <input type="checkbox" name="flags" value="Capture their best contact number/email address"> Capture their best contact number/email address<br>
+                        <input type="checkbox" name="flags" value="Provide customer BAN"> Provide customer BAN<br>
+                        <input type="checkbox" name="flags" value="Do not sell 3 or more devices"> Do not sell 3 or more devices<br>
+                    </div>
+
+                    <!-- Account Documentation -->
+                    <div>
+                        <h4>Account Documentation</h4>
+                        <input type="checkbox" name="flags" value="No notes"> No notes<br>
+                        <input type="checkbox" name="flags" value="Incomplete notes"> Incomplete notes<br>
+                        <input type="checkbox" name="flags" value="Inaccurate notes"> Inaccurate notes<br>
+                    </div>
+
+                    <!-- Call Summary -->
+                    <div>
+                        <h4>Call Summary</h4>
+                        <input type="checkbox" name="flags" value="Billing recap"> Billing recap<br>
+                        <input type="checkbox" name="flags" value="Tablet Activation"> Tablet Activation<br>
+                        <input type="checkbox" name="flags" value="Term and cancellation"> Term and cancellation<br>
+                        <input type="checkbox" name="flags" value="SIM activation and billing"> SIM activation and billing<br>
+                        <input type="checkbox" name="flags" value="Wireless Home Phone Activation"> Wireless Home Phone Activation<br>
+                        <input type="checkbox" name="flags" value="Extended Warranty"> Extended Warranty<br>
+                        <input type="checkbox" name="flags" value="TELUS Online Security"> TELUS Online Security<br>
+                        <input type="checkbox" name="flags" value="Stream+"> Stream+<br>
+                    </div>
+
+                    <!-- Business Intelligence -->
+                    <div>
+                        <h4>Business Intelligence</h4>
+                        <input type="checkbox" name="flags" value="Failed to Cross-sell"> Failed to Cross-sell<br>
+                    </div>
+
+                    <!-- Marketing Objectives -->
+                    <div>
+                        <h4>Marketing Objectives</h4>
+                        <input type="checkbox" name="flags" value="Account Linking"> Account Linking<br>
+                        <input type="checkbox" name="flags" value="Email Capture"> Email Capture<br>
+                        <input type="checkbox" name="flags" value="Survey Promotion"> Survey Promotion<br>
+                    </div>
+                </div>
+
+
+            <!-- Page 3: Professionalism -->
+            <div id="page3" class="question-section" style="display:none;">
+                <h3>Professionalism</h3>
+                <div class="question-group">
+                    <label>Professionalism:</label>
+                    <input type="checkbox" name="professionalism" value="Agent did not follow credit check guidelines"> Agent did not follow credit check guidelines<br>
+                    <input type="checkbox" name="professionalism" value="Agent did not act as an extension of TELUS"> Agent did not act as an extension of TELUS<br>
+                    <input type="checkbox" name="professionalism" value="Transferring calls to the IVR without informing the customer"> Transferring calls to the IVR without informing the customer<br>
+                    <input type="checkbox" name="professionalism" value="Agent sold product or service under false pretences"> Agent sold product or service under false pretences<br>
+                    <input type="checkbox" name="professionalism" value="Excessive hold or dead air"> Excessive hold or dead air<br>
+                    <input type="checkbox" name="professionalism" value="Sharing personal information (DL#, SIN, Passport#)"> Sharing personal information (DL#, SIN, Passport#)<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Use of Profanity"> ZTP - Use of Profanity<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Unethical VOC Practices"> ZTP - Unethical VOC Practices<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Misuse of customer's credit information"> ZTP - Misuse of customer's credit information<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Failure to authenticate"> ZTP - Failure to authenticate<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Proactively re-rate"> ZTP - Proactively re-rate<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Misleading or purposefully giving inaccurate information"> ZTP - Misleading or purposefully giving inaccurate information<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Slam sales/Selling to vulnerable customers"> ZTP - Slam sales/Selling to vulnerable customers<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Manipulating sales information/established processes"> ZTP - Manipulating sales information/established processes<br>
+                    <input type="checkbox" name="professionalism" value="ZTP - Selling based on installation/cancellation"> ZTP - Selling based on installation/cancellation<br>
+                </div>
+            </div>
+
+<!-- ZVIQ Eval ID and Flags/Professionalism Remarks Section (shown conditionally) -->
+<div id="zviqRemarks" class="question-group" style="display:none;">
+    <label for="zviqEvalID">ZVIQ Eval ID:</label>
+    <input type="text" id="zviqEvalID" name="zviqEvalID">
+
+    <label for="flagRemarks">Remarks:</label>
+    <textarea id="flagRemarks" name="flagRemarks" rows="4" style="width: 100%;"></textarea>
+</div>
+
+       
+        </form>
+    </div>
+                    <!-- Clear form button and Submit button -->
+                <div class="actionsWLS">
+                    <button type="reset"  class="clearWLS">Clear Form</button>
+                    <button type="submit" class="submitWLS">Submit</button>
+                </div>     
+</div>
+
+<!-- Confirmation Modal (Next Page) Structure -->
+<div id="summaryModal" class="modal">
+    <div class="modal-content">
+        <div id="summaryContent">
+            <!-- Summary content will be dynamically inserted here -->
+        </div>
+        <button class="back-summary">Back to Eval form</button>
+        <button class="close-summary">Close</button>
+    </div>
+</div>
+</div>
+
+</body>
+<script>
+// Global variables
+let currentRowData = null;
+let currentFormType = 'WLS';
+let isBacklogMode = false;
+let currentUniqueId = null;
+
+// Initialize WLS page
+function initializeWLSPage() {
+    console.log('Initializing WLS page...');
+    loadSalesData();
+    setupEventListeners();
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Search input
+    const searchInput = document.getElementById('searchInputWLS');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearch);
+    }
+
+    // Filter buttons
+    document.querySelectorAll('.filter-buttons-WLS button').forEach(button => {
+        button.addEventListener('click', handleFilterClick);
+    });
+
+    // Modal close
+    document.querySelector('.closeModal').addEventListener('click', closeModal);
+    
+    // Form submission
+    document.getElementById('evalFormWLS').addEventListener('submit', handleFormSubmit);
+    
+    // Call disposition change
+    document.getElementById('callDisposition').addEventListener('change', handleCallDispositionChange);
+    
+    // Summary modal buttons
+    document.querySelector('.back-summary').addEventListener('click', () => {
+        document.getElementById('summaryModal').style.display = 'none';
+        document.getElementById('formModalWLS').style.display = 'flex';
+    });
+    
+    document.querySelector('.close-summary').addEventListener('click', () => {
+        document.getElementById('summaryModal').style.display = 'none';
+        document.getElementById('formModalWLS').style.display = 'none';
+    });
+}
+
+// Handle filter button clicks
+function handleFilterClick(event) {
+    const button = event.target;
+    const category = button.dataset.category;
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.filter-buttons-WLS button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Add active class to clicked button
+    button.classList.add('active');
+    
+    // Filter data
+    filterTableData(category);
+}
+
+// Load sales data
+function loadSalesData() {
+    document.getElementById('tableLoader').style.display = 'flex';
+    
+    google.script.run
+        .withSuccessHandler(handleSalesDataSuccess)
+        .withFailureHandler(handleError)
+        .getSalesData();
+}
+
+// Handle successful data load
+function handleSalesDataSuccess(data) {
+    console.log('Sales data loaded:', data);
+    window.salesData = data;
+    populateTable(data.data, data.ids);
+    document.getElementById('tableLoader').style.display = 'none';
+}
+
+// Populate table with data
+function populateTable(data, ids) {
+    const table = document.getElementById('salesTableWLS');
+    const thead = table.querySelector('thead');
+    const tbody = table.querySelector('tbody');
+    
+    // Clear existing content
+    thead.innerHTML = '';
+    tbody.innerHTML = '';
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="100%">No data available</td></tr>';
+        return;
+    }
+    
+    // Create header
+    const headerRow = document.createElement('tr');
+    const headers = ['Status', 'SV Name', 'Date Validated', 'Sale Date', 'xID', 'Agent Name', 'BAN', 'Phone Number', 'Sold BAN', 'Sold Phone', 'CSS Portfolio', 'Product ID', 'Order ID', 'Due Date', 'Multiple Sales', 'Number of Sales', 'Actions'];
+    
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    
+    // Create rows
+    data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        
+        row.forEach(cell => {
+            const td = document.createElement('td');
+            td.textContent = cell || '';
+            tr.appendChild(td);
+        });
+        
+        // Add actions column
+        const actionsTd = document.createElement('td');
+        const evalButton = document.createElement('button');
+        evalButton.textContent = 'Eval';
+        evalButton.className = 'eval-btn';
+        evalButton.onclick = () => openEvalForm(row, ids[index]);
+        actionsTd.appendChild(evalButton);
+        tr.appendChild(actionsTd);
+        
+        tbody.appendChild(tr);
+    });
+}
+
+// Open evaluation form
+function openEvalForm(rowData, uniqueId) {
+    currentRowData = rowData;
+    currentUniqueId = uniqueId;
+    
+    // Populate form fields
+    document.getElementById('dateValidatedWLS').textContent = rowData[2] || '';
+    document.getElementById('saleDateWLS').textContent = rowData[3] || '';
+    document.getElementById('xIDWLS').textContent = rowData[4] || '';
+    document.getElementById('agentName').textContent = rowData[5] || '';
+    document.getElementById('banWLS').textContent = rowData[6] || '';
+    document.getElementById('phoneNumberWLS').textContent = rowData[7] || '';
+    document.getElementById('soldBANWLS').textContent = rowData[8] || '';
+    document.getElementById('soldPhoneWLS').textContent = rowData[9] || '';
+    document.getElementById('cssPortfolioWLS').textContent = rowData[10] || '';
+    document.getElementById('productIDWLS').textContent = rowData[11] || '';
+    document.getElementById('orderIDWLS').textContent = rowData[12] || '';
+    document.getElementById('dueDateWLS').textContent = rowData[13] || '';
+    document.getElementById('multipleSalesWLS').textContent = rowData[14] || '';
+    document.getElementById('numberOfSalesWLS').textContent = rowData[15] || '';
+    document.getElementById('svNameWLS').textContent = rowData[1] || '';
+    
+    // Show modal
+    document.getElementById('formModalWLS').style.display = 'flex';
+    
+    // Load existing eval data if available
+    loadExistingEvalData(uniqueId);
+}
+
+// Load existing evaluation data
+function loadExistingEvalData(uniqueId) {
+    google.script.run
+        .withSuccessHandler(populateExistingData)
+        .withFailureHandler(() => console.log('No existing data found'))
+        .getRealtimeDataFromSheet(uniqueId, 'WLS');
+}
+
+// Populate form with existing data
+function populateExistingData(data) {
+    if (!data) return;
+    
+    // Set call disposition
+    document.getElementById('callDisposition').value = data.callDisposition || '';
+    
+    // Set ZVIQ Eval ID
+    document.getElementById('zviqEvalID').value = data.zviqEvalID || '';
+    
+    // Set remarks
+    document.getElementById('flagRemarks').value = data.profFlagRemarks || '';
+    document.getElementById('goodSaleRemarks').value = data.goodSaleRemarks || '';
+    
+    // Set flags
+    if (data.selectedFlags) {
+        Object.entries(data.selectedFlags).forEach(([category, flags]) => {
+            flags.forEach(flag => {
+                const checkbox = document.querySelector(`input[value="${flag}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        });
+    }
+    
+    // Trigger call disposition change to show/hide sections
+    handleCallDispositionChange();
+}
+
+// Handle call disposition change
+function handleCallDispositionChange() {
+    const disposition = document.getElementById('callDisposition').value;
+    const remarksSection = document.getElementById('remarksSection');
+    const page2 = document.getElementById('page2');
+    const page3 = document.getElementById('page3');
+    const zviqRemarks = document.getElementById('zviqRemarks');
+    
+    // Hide all sections initially
+    remarksSection.style.display = 'none';
+    page2.style.display = 'none';
+    page3.style.display = 'none';
+    zviqRemarks.style.display = 'none';
+    
+    if (disposition.includes('Good Sale')) {
+        remarksSection.style.display = 'block';
+        document.getElementById('remarksLabel').textContent = 'Good Sale Remarks:';
+    } else if (disposition.includes('Fall-out') || disposition.includes('Non-fallout')) {
+        page2.style.display = 'block';
+        page3.style.display = 'block';
+        zviqRemarks.style.display = 'block';
+    }
+}
+
+// Handle form submission
+function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    const formData = collectFormData();
+    showSummary(formData);
+}
+
+// Collect form data
+function collectFormData() {
+    const formData = {
+        svName: document.getElementById('svNameWLS').textContent,
+        dateValidated: document.getElementById('dateValidatedWLS').textContent,
+        saleDate: document.getElementById('saleDateWLS').textContent,
+        xID: document.getElementById('xIDWLS').textContent,
+        ban: document.getElementById('banWLS').textContent,
+        phoneNumber: document.getElementById('phoneNumberWLS').textContent,
+        soldBAN: document.getElementById('soldBANWLS').textContent,
+        soldPhone: document.getElementById('soldPhoneWLS').textContent,
+        cssPortfolio: document.getElementById('cssPortfolioWLS').textContent,
+        productID: document.getElementById('productIDWLS').textContent,
+        orderID: document.getElementById('orderIDWLS').textContent,
+        dueDate: document.getElementById('dueDateWLS').textContent,
+        multipleSales: document.getElementById('multipleSalesWLS').textContent,
+        numberOfSales: document.getElementById('numberOfSalesWLS').textContent,
+        agentName: document.getElementById('agentName').textContent,
+        callDisposition: document.getElementById('callDisposition').value,
+        zviqEvalID: document.getElementById('zviqEvalID').value,
+        profFlagRemarks: document.getElementById('flagRemarks').value,
+        goodSaleRemarks: document.getElementById('goodSaleRemarks').value,
+        selectedFlags: {
+            'Regulatory': [],
+            'Privacy': [],
+            'Price Information': [],
+            'Plan Information': [],
+            'Order Processing': [],
+            'Account Documentation': [],
+            'Call Summary': [],
+            'Business Intelligence': [],
+            'Marketing Objectives': [],
+            'Professionalism': []
+        }
+    };
+    
+    // Collect flags
+    document.querySelectorAll('input[name="flags"]:checked').forEach(checkbox => {
+        const value = checkbox.value;
+        const section = checkbox.closest('div').querySelector('h4')?.textContent;
+        if (section && formData.selectedFlags[section]) {
+            formData.selectedFlags[section].push(value);
+        }
+    });
+    
+    // Collect professionalism flags
+    document.querySelectorAll('input[name="professionalism"]:checked').forEach(checkbox => {
+        formData.selectedFlags['Professionalism'].push(checkbox.value);
+    });
+    
+    return formData;
+}
+
+// Show summary modal
+function showSummary(formData) {
+    const summaryContent = document.getElementById('summaryContent');
+    
+    let summaryHTML = '<h3>Evaluation Summary</h3>';
+    summaryHTML += `<p><strong>Agent Name:</strong> ${formData.agentName}</p>`;
+    summaryHTML += `<p><strong>Phone Number:</strong> ${formData.phoneNumber}</p>`;
+    summaryHTML += `<p><strong>Call Disposition:</strong> ${formData.callDisposition}</p>`;
+    
+    if (formData.zviqEvalID) {
+        summaryHTML += `<p><strong>ZVIQ Eval ID:</strong> ${formData.zviqEvalID}</p>`;
+    }
+    
+    if (formData.goodSaleRemarks) {
+        summaryHTML += `<p><strong>Good Sale Remarks:</strong> ${formData.goodSaleRemarks}</p>`;
+    }
+    
+    if (formData.profFlagRemarks) {
+        summaryHTML += `<p><strong>Flag Remarks:</strong> ${formData.profFlagRemarks}</p>`;
+    }
+    
+    // Show selected flags
+    Object.entries(formData.selectedFlags).forEach(([category, flags]) => {
+        if (flags.length > 0) {
+            summaryHTML += `<p><strong>${category}:</strong> ${flags.join(', ')}</p>`;
+        }
+    });
+    
+    summaryHTML += '<div style="margin-top: 20px;">';
+    summaryHTML += '<button class="back-summary">Back to Form</button>';
+    summaryHTML += '<button class="close-summary" onclick="submitFinalForm()">Confirm & Submit</button>';
+    summaryHTML += '</div>';
+    
+    summaryContent.innerHTML = summaryHTML;
+    
+    // Hide form modal and show summary
+    document.getElementById('formModalWLS').style.display = 'none';
+    document.getElementById('summaryModal').style.display = 'flex';
+}
+
+// Submit final form
+function submitFinalForm() {
+    const formData = collectFormData();
+    
+    google.script.run
+        .withSuccessHandler(() => {
+            alert('Form submitted successfully!');
+            closeModal();
+            loadSalesData(); // Refresh data
+        })
+        .withFailureHandler(handleError)
+        .handleFormSubmission('WLS', formData);
+}
+
+// Close modal
+function closeModal() {
+    document.getElementById('formModalWLS').style.display = 'none';
+    document.getElementById('summaryModal').style.display = 'none';
+    
+    // Reset form
+    document.getElementById('evalFormWLS').reset();
+    
+    // Hide conditional sections
+    document.getElementById('remarksSection').style.display = 'none';
+    document.getElementById('page2').style.display = 'none';
+    document.getElementById('page3').style.display = 'none';
+    document.getElementById('zviqRemarks').style.display = 'none';
+}
+
+// Handle search input
+function handleSearch() {
+    const searchTerm = document.getElementById('searchInputWLS').value.toLowerCase();
+    const activeCategory = document.querySelector('.filter-buttons-WLS button.active').dataset.category;
+    
+    if (!window.salesData) return;
+    
+    let filteredData = window.salesData.data;
+    let filteredIds = window.salesData.ids;
+    
+    // Apply category filter first
+    if (activeCategory !== 'ALL') {
+        const categoryFiltered = [];
+        const categoryFilteredIds = [];
+        
+        window.salesData.data.forEach((row, index) => {
+            if (row[10] === activeCategory) {
+                categoryFiltered.push(row);
+                categoryFilteredIds.push(window.salesData.ids[index]);
+            }
+        });
+        
+        filteredData = categoryFiltered;
+        filteredIds = categoryFilteredIds;
+    }
+    
+    // Apply search filter
+    if (searchTerm) {
+        const searchFiltered = [];
+        const searchFilteredIds = [];
+        
+        filteredData.forEach((row, index) => {
+            const searchableText = [
+                row[5] || '', // Agent Name
+                row[4] || '', // xID
+                row[6] || '', // BAN
+                row[7] || '', // Phone Number
+                row[8] || '', // Sold BAN
+                row[9] || ''  // Sold Phone
+            ].join(' ').toLowerCase();
+            
+            if (searchableText.includes(searchTerm)) {
+                searchFiltered.push(row);
+                searchFilteredIds.push(filteredIds[index]);
+            }
+        });
+        
+        filteredData = searchFiltered;
+        filteredIds = searchFilteredIds;
+    }
+    
+    populateTable(filteredData, filteredIds);
+}
+
+// Filter table data
+function filterTableData(category) {
+    if (!window.salesData) return;
+    
+    let filteredData = window.salesData.data;
+    let filteredIds = window.salesData.ids;
+    
+    if (category !== 'ALL') {
+        const filtered = [];
+        const filteredIdsList = [];
+        
+        window.salesData.data.forEach((row, index) => {
+            if (row[10] === category) { // CSS Portfolio column
+                filtered.push(row);
+                filteredIdsList.push(window.salesData.ids[index]);
+            }
+        });
+        
+        filteredData = filtered;
+        filteredIds = filteredIdsList;
+    }
+    
+    // Apply search filter if there's a search term
+    const searchTerm = document.getElementById('searchInputWLS').value.toLowerCase();
+    if (searchTerm) {
+        const searchFiltered = [];
+        const searchFilteredIds = [];
+        
+        filteredData.forEach((row, index) => {
+            const searchableText = [
+                row[5] || '', // Agent Name
+                row[4] || '', // xID
+                row[6] || '', // BAN
+                row[7] || '', // Phone Number
+                row[8] || '', // Sold BAN
+                row[9] || ''  // Sold Phone
+            ].join(' ').toLowerCase();
+            
+            if (searchableText.includes(searchTerm)) {
+                searchFiltered.push(row);
+                searchFilteredIds.push(filteredIds[index]);
+            }
+        });
+        
+        filteredData = searchFiltered;
+        filteredIds = searchFilteredIds;
+    }
+    
+    populateTable(filteredData, filteredIds);
+}
+
+// Handle errors
+function handleError(error) {
+    console.error('Error:', error);
+    alert('An error occurred: ' + error.message);
+    document.getElementById('tableLoader').style.display = 'none';
+}
+
+// Initialize page when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeWLSPage();
+});
+</script>
+
+</html>
