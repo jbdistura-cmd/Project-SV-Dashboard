@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DNC</title>
+<style>
+/* Essential Variables */
+:root {
+    --primary-color-light: #66CC00;
+    --primary-color-dark: #6A5ACD;
+    --text-color-light: #333333;
+    --text-color-dark: #f0f0f0;
+    --border-color-light: #e0e0e0;
+    --border-color-dark: #4a4a4a;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body.dark {
+    background-color: var(--background-color-dark);
+    color: var(--text-color-dark);
+}
+
+/* Basic Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 800px;
+}
+
+thead th {
+    position: sticky;
+    top: 40px;
+    background-color: var(--primary-color-light);
+    padding: 12px;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+tbody td {
+    padding: 12px;
+    font-size: 14px;
+}
+
+/* Title Styling */
+.title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: var(--primary-color-light);
+}
+
+.title i {
+    margin-right: 10px;
+}
+
+/* Loading Animation */
+.table-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.table-loader .container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.table-loader .preloader {
+    animation: rotate 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes rotate {
+    50% {
+        transform: rotate(360deg);
+    }
+    100% {
+        transform: rotate(720deg);
+    }
+}
+
+.preloader span {
+    position: absolute;
+    display: block;
+    height: 64px;
+    width: 64px;
+    background: var(--primary-color-light);
+    border: 1px solid var(--primary-color-light);
+    border-radius: 100%;
+}
+
+.preloader span:nth-child(1) {
+    transform: translate(-28px, -28px);
+    animation: shape_1 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes shape_1 {
+    60% {
+        transform: scale(0.4);
+    }
+}
+
+.preloader span:nth-child(2) {
+    transform: translate(28px, -28px);
+    animation: shape_2 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes shape_2 {
+    40% {
+        transform: scale(0.4);
+    }
+}
+
+.preloader span:nth-child(3) {
+    position: relative;
+    border-radius: 0px;
+    transform: scale(0.98) rotate(-45deg);
+    animation: shape_3 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes shape_3 {
+    50% {
+        border-radius: 100%;
+        transform: scale(0.5) rotate(-45deg);
+    }
+    100% {
+        transform: scale(0.98) rotate(-45deg);
+    }
+}
+
+.shadow {
+    position: relative;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: block;
+    height: 16px;
+    width: 64px;
+    border-radius: 50%;
+    background-color: var(--border-color-light);
+    border: 1px solid var(--border-color-light);
+    animation: shadow 2.3s cubic-bezier(0.75, 0, 0.5, 1) infinite;
+}
+
+@keyframes shadow {
+    50% {
+        transform: translateX(-50%) scale(0.5);
+        opacity: 0.5;
+    }
+}
+
+.table-loader .loader-text {
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+}
+
+</style>
+
+</head>
+<body>
+<div class="sales-dump-dnc">
+    <div id="tableLoader" class="table-loader">
+        <div class="container">
+            <div class="preloader">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="shadow"></div>
+        </div>
+        <div class="loader-text">Loading Sales Data...</div>
+    </div>
+    <div class="overview">
+        <div class="title">
+            <i class="fas fa-ban"></i>
+            <span class="text">DNC</span>
+        </div>
+
+        <div class="search-container" style="margin-bottom: 15px;">
+            <input type="text" id="searchInputDNC" placeholder="Search by Agent Name, xID, BAN, Phone Number..." style="width: 300px; padding: 10px; border: 1px solid var(--border-color-light); border-radius: 5px; font-size: 14px;">
+        </div>
+
+        <table id="salesTableDNC">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
