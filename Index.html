@@ -1,0 +1,3977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SV Dashboard Panel</title>
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
+
+<style>
+    /* Font with display swap for faster rendering */
+    @font-face {
+        font-family: 'Poppins';
+        font-display: swap;
+        src: url('https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2') format('woff2');
+    }
+    /* General reset and box-sizing for all elements */
+    * {
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+        box-sizing: border-box; /* Include padding and border in the element’s total width and height */
+        font-family: 'Poppins', sans-serif; /* Apply the Poppins font to all elements */
+    }
+    /* Defining custom CSS variables for easy color and transition management */
+    :root {
+        --primary-color: #66CC00; /* Main color for primary elements */
+        --panel-color: #FFF; /* Background color for panels */
+        --text-color: #000; /* Default text color */
+        --black-light-color: #707070; /* Lighter black for icons and text */
+        --border-color: #e6e5e5; /* Color for borders */
+        --toggle-color: #DDD; /* Color for toggle switches */
+        --box1-color: #4DA3FF; /* Color for the first type of box */
+        --box2-color: #FFE6AC; /* Color for the second type of box */
+        --box3-color: #E7D1FC; /* Color for the third type of box */
+        --title-icon-color: #fff; /* Color for icons in titles */
+        --tran-05: all 0.5s ease; /* 0.5 seconds transition */
+        --tran-03: all 0.3s ease; /* 0.3 seconds transition */
+        --tran-02: all 0.2s ease; /* 0.2 seconds transition */
+    }
+/* Remove the overflow-x: hidden from body */
+body {
+    min-height: 100vh;
+    background-color: var(--panel-color);
+    margin: 0;
+    padding: 0;
+    position: relative; /* Add this */
+}
+/* Add a background wrapper that extends beyond scroll area */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--panel-color);
+    z-index: -1; /* Place it behind all content */
+}
+    /* Dark mode adjustments */
+    body.dark {
+        --primary-color: #6A5ACD; /* Maintain primary color in dark mode */
+        --panel-color: #242526; /* Dark background for panels in dark mode */
+        --text-color: #CCC; /* Lighter text color for dark mode */
+        --black-light-color: #CCC; /* Lighter color for icons and text in dark mode */
+        --border-color: #4D4C4C; /* Darker border color in dark mode */
+        --toggle-color: #FFF; /* Toggle switch color in dark mode */
+        --box1-color: #3A3B3C; /* Darker color for the first type of box in dark mode */
+        --box2-color: #3A3B3C; /* Darker color for the second type of box in dark mode */
+        --box3-color: #3A3B3C; /* Darker color for the third type of box in dark mode */
+        --title-icon-color: #CCC; /* Lighter icon color in dark mode */
+    }    
+    /* Custom scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px; /* Width of the scrollbar */
+    }
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Background of the scrollbar track */
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-color); /* Color of the scrollbar thumb */
+        border-radius: 12px; /* Rounded corners for the scrollbar thumb */
+        transition: all 0.5s ease; /* Smooth transition for hover effect */
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #0b3cc1; /* Darker color on hover */
+    }
+    body.dark::-webkit-scrollbar-thumb:hover {
+        background: #3A3B3C; /* Dark mode color for scrollbar thumb on hover */
+    }
+    /* Navigation styling */
+    nav {
+        position: fixed; /* Fixed position for the sidebar */
+        top: 0; /* Align to the top */
+        left: 0; /* Align to the left */
+        height: 100%; /* Full height */
+        width: 250px; /* Default width of the sidebar */
+        padding: 10px 14px; /* Padding inside the sidebar */
+        background-color: var(--panel-color); /* Background color for the sidebar */
+        border-right: 1px solid var(--border-color); /* Right border for the sidebar */
+        transition: all 0.5s ease; /* Smooth transition for width change */
+        overflow: visible;
+        z-index: 1000;
+    }
+    nav.close {
+        width: 73px; /* Reduced width when sidebar is closed */
+    }
+    /* Logo and name styling in the sidebar */
+    nav .logo-name {
+        display: flex; /* Flexbox for aligning logo and name */
+        align-items: center; /* Center items vertically */
+    }
+    nav .logo-image {
+        display: flex; /* Flexbox for logo image */
+        justify-content: center; /* Center image horizontally */
+        min-width: 45px; /* Minimum width for the image container */
+    }
+    nav .logo-image img {
+        width: 65px; /* Width of the logo image */
+        object-fit: cover; /* Ensure image fits without distortion */
+        border-radius: 20%; /* Circular logo image */
+    }
+    nav .logo-name .logo_name {
+        font-size: 22px; /* Font size for the logo name */
+        font-weight: 600; /* Bold font weight */
+        color: var(--text-color); /* Color for the logo name */
+        margin-left: 14px; /* Space between logo and name */
+        transition: var(--tran-05); /* Smooth transition for logo name */
+    }
+    nav.close .logo_name {
+        opacity: 0; /* Hide logo name when sidebar is closed */
+        pointer-events: none; /* Disable interactions */
+    }
+    /* Menu items styling */
+    nav .menu-items {
+        margin-top: 40px; /* Space above menu items */
+        height: calc(100% - 90px); /* Adjust height based on other elements */
+        display: flex; /* Flexbox for aligning menu items */
+        flex-direction: column; /* Arrange menu items vertically */
+        justify-content: space-between; /* Space out menu items */
+    }
+    .menu-items li {
+        list-style: none; /* Remove default list styling */
+    }
+    .menu-items li a {
+        display: flex; /* Flexbox for aligning icons and text */
+        align-items: center; /* Center items vertically */
+        height: 50px; /* Height of menu items */
+        text-decoration: none; /* Remove underline from links */
+        position: relative; /* Position relative for hover effect */
+    }
+    /* Icon and text styling in menu items */
+    .menu-items li a i {
+        font-size: 24px; /* Font size for icons */
+        min-width: 45px; /* Minimum width for icon container */
+        height: 100%; /* Full height */
+        display: flex; /* Flexbox for aligning icons */
+        align-items: center; /* Center icons vertically */
+        justify-content: center; /* Center icons horizontally */
+        color: var(--black-light-color); /* Color for icons */
+    }
+    .menu-items li a .link-name {
+        font-size: 18px; /* Font size for link names */
+        font-weight: 400; /* Normal font weight */
+        color: var(--black-light-color); /* Color for link names */
+        transition: var(--tran-05); /* Smooth transition for link name */
+    }
+    nav.close li a .link-name {
+        opacity: 0; /* Hide link names when sidebar is closed */
+        pointer-events: none; /* Disable interactions */
+    }
+    .nav-links li a:hover i,
+    .nav-links li a:hover .link-name {
+        color: var(--primary-color); /* Change color on hover */
+    }
+    body.dark .nav-links li a:hover i,
+    body.dark .nav-links li a:hover .link-name {
+        color: var(--primary-color); /* Dark mode hover color */
+    }
+    /* Dark Mode toggle styling */
+    .menu-items .mode {
+        display: flex; /* Flexbox for aligning mode toggle */
+        align-items: center; /* Center items vertically */
+        white-space: nowrap; /* Prevent wrapping of mode text */
+    }
+    .menu-items .mode-toggle {
+        position: absolute; /* Absolute positioning for toggle */
+        right: 14px; /* Position on the right side */
+        height: 50px; /* Height of the toggle */
+        min-width: 45px; /* Minimum width for the toggle container */
+        display: flex; /* Flexbox for aligning toggle */
+        align-items: center; /* Center items vertically */
+        justify-content: center; /* Center items horizontally */
+        cursor: pointer; /* Pointer cursor for clickability */
+    }
+    .mode-toggle .switch {
+        position: relative; /* Relative positioning for the switch */
+        display: inline-block; /* Inline-block for switch container */
+        height: 22px; /* Height of the switch */
+        width: 40px; /* Width of the switch */
+        border-radius: 25px; /* Rounded corners for the switch */
+        background-color: var(--toggle-color); /* Background color of the switch */
+    }
+    .switch:before {
+        content: ""; /* Empty content for switch knob */
+        position: absolute; /* Absolute positioning for the knob */
+        left: 5px; /* Initial position of the knob */
+        top: 50%; /* Center vertically */
+        transform: translateY(-50%); /* Center knob vertically */
+        height: 15px; /* Height of the knob */
+        width: 15px; /* Width of the knob */
+        background-color: var(--panel-color); /* Color of the switch knob */
+        border-radius: 50%; /* Circular switch knob */
+        transition: var(--tran-03); /* Smooth transition for switch movement */
+    }
+    body.dark .switch:before {
+        left: 20px; /* Position of the switch knob in dark mode */
+    }
+    /* Dashboard styling */
+    .dashboard {
+        position: relative; /* Relative positioning for the dashboard */
+        left: 250px; /* Offset to make space for the sidebar */
+        background-color: var(--panel-color); /* Background color for the dashboard */
+        min-height: 100vh; /* Ensure it takes up full viewport height */
+        width: calc(100% - 250px); /* Adjust width based on sidebar */
+        padding: 10px 14px; /* Padding inside the dashboard */
+        transition: var(--tran-05); /* Smooth transition for width change */
+    }
+    nav.close ~ .dashboard {
+        left: 70px; /* Adjust offset when sidebar is closed */
+        width: calc(100% - 70px); /* Adjust width when sidebar is closed */
+    }
+    /* Top bar styling within the dashboard */
+    .dashboard .top {
+        position: fixed; /* Fixed position for the top bar */
+        top: 0; /* Align to the top */
+        left: 250px; /* Offset to make space for the sidebar */
+        display: flex; /* Flexbox for aligning top bar elements */
+        width: calc(100% - 250px); /* Adjust width based on sidebar */
+        justify-content: space-between; /* Space between elements */
+        align-items: center; /* Center items vertically */
+        padding: 10px 14px; /* Padding inside the top bar */
+        background-color: var(--panel-color); /* Background color of the top bar */
+        border-bottom: 1px solid var(--border-color); /* Bottom border for the top bar */
+        z-index: 100; /* Ensure it stays on top */
+        transition: var(--tran-05); /* Smooth transition for width change */
+    }
+    nav.close ~ .dashboard .top {
+        left: 70px; /* Adjust offset when sidebar is closed */
+        width: calc(100% - 70px); /* Adjust width when sidebar is closed */
+        border-bottom: 1px Transparent; /* Bottom border for the top bar */
+    }
+        .dashboard .top .sidebar-toggle {
+            font-size: 26px; /* Font size for the sidebar toggle icon */
+            color: var(--text-color); /* Color of the toggle icon */
+            cursor: pointer; /* Pointer cursor for clickability */
+        }              
+        .top img {
+            width: 40px; /* Width of images */
+            border-radius: 50%; /* Circular images */
+        }       
+        .dashboard .dash-content {
+            padding-top: 50px; /* Space above the content */
+        }        
+        .dash-content .title {
+            display: flex; /* Flexbox for aligning title elements */
+            align-items: center; /* Center items vertically */
+            margin: 60px 0 30px 0; /* Margin around the title */
+        }        
+        .dash-content .title i {
+            position: relative; /* Relative positioning for the icon */
+            height: 35px; /* Height of the icon container */
+            width: 35px; /* Width of the icon container */
+            background-color: var(--primary-color); /* Background color of the icon container */
+            border-radius: 6px; /* Rounded corners */
+            color: var(--title-icon-color); /* Icon color */
+            display: flex; /* Flexbox for aligning the icon */
+            align-items: center; /* Center icon vertically */
+            justify-content: center; /* Center icon horizontally */
+            font-size: 24px; /* Font size of the icon */
+        }        
+        .dash-content .title .text {
+            font-size: 24px; /* Font size for the title text */
+            font-weight: 500; /* Font weight */
+            color: var(--text-color); /* Text color */
+            margin-left: 10px; /* Space between icon and text */
+        }       
+        .dash-content .boxes {
+            display: flex; /* Flexbox for aligning boxes */
+            align-items: center; /* Center boxes vertically */
+            justify-content: space-between; /* Space between boxes */
+            flex-wrap: wrap; /* Wrap boxes to next line if needed */
+        }       
+        .dash-content .boxes .box {
+            display: flex; /* Flexbox for aligning box elements */
+            flex-direction: column; /* Arrange elements vertically */
+            align-items: center; /* Center items horizontally */
+            border-radius: 30px; /* Rounded corners */
+            width: calc(100% / 2 - 8px); /* Width of each box */
+            padding: 15px 20px; /* Padding inside the box */
+            background-color: var(--box1-color); /* Background color */
+            transition: var(--tran-05); /* Smooth transition for hover effect */
+        }        
+        .boxes .box i {
+            font-size: 35px; /* Font size for icons inside boxes */
+            color: var(--text-color); /* Icon color */
+        }       
+        .boxes .box .text {
+            white-space: nowrap; /* Prevent text from wrapping */
+            font-size: 18px; /* Font size for text inside boxes */
+            font-weight: 500; /* Font weight */
+            color: var(--text-color); /* Text color */
+        }       
+        .boxes .box .number {
+            font-size: 40px; /* Font size for numbers inside boxes */
+            font-weight: 500; /* Font weight */
+            color: var(--text-color); /* Text color */
+        }        
+        .boxes .box.box2 {
+            background-color: var(--box2-color); /* Background color for the second type of box */
+        }        
+        .boxes .box.box3 {
+            background-color: var(--box3-color); /* Background color for the third type of box */
+        }       
+        .dash-content .activity .activity-data {
+            display: flex; /* Flexbox for aligning activity data */
+            justify-content: space-between; /* Space between activity data items */
+            align-items: center; /* Center items vertically */
+            width: 100%; /* Full width */
+        }        
+        .activity .activity-data {
+            display: flex; /* Flexbox for aligning activity data items */
+        }       
+        .activity-data .data {
+            display: flex; /* Flexbox for aligning data elements */
+            flex-direction: column; /* Arrange elements vertically */
+            margin: 0 15px; /* Margin around data items */
+        }       
+        .activity-data .data-title {
+            font-size: 20px; /* Font size for data titles */
+            font-weight: 500; /* Font weight */
+            color: var(--text-color); /* Text color */
+        }
+        .activity-data .data .data-list {
+            font-size: 18px; /* Font size for data list items */
+            font-weight: 400; /* Font weight */
+            margin-top: 20px; /* Space above the data list */
+            white-space: nowrap; /* Prevent text from wrapping */
+            color: var(--text-color); /* Text color */
+        }  
+        /* Base dropdown menu styling */
+        .dropdown-menu {
+            display: none; /* Hide dropdown menu by default */
+            list-style: none; /* Remove default list styling */
+            padding: 0; /* Remove padding */
+            margin: 0; /* Remove margin */
+            position: flex; /* Position below the parent */
+            background-color: var(--panel-color); /* Background color of the dropdown */
+            border-radius: 4px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+            z-index: 200; /* Ensure it is above other elements */
+            top: 100%; /* Default position below the parent element */
+            left: 0; /* Align left with the parent element */
+        }
+        /* Show dropdown menu on hover */
+        .dropdown:hover .dropdown-menu {
+            display: block; /* Show dropdown menu */
+        }
+        /* Dropdown menu items styling */
+        .dropdown-menu li a {
+            display: block; /* Block display for dropdown items */
+            padding: 10px 20px; /* Padding inside dropdown items */
+            text-decoration: none; /* Remove underline from links */
+            color: var(--black-light-color); /* Text color */
+            transition: background-color var(--tran-03); /* Smooth transition for hover effect */
+        }
+        /* Hover effect for dropdown items */
+        .dropdown-menu li a:hover {
+            background-color: var(--primary-color); /* Change background color on hover */
+            color: var(--panel-color); /* Change text color on hover */
+        }
+        /* Adjust dropdown positioning when sidebar is closed */
+        nav.close .dropdown-menu {
+            top: 25.5%; /* Align with the top of the icon */
+            left: 100%; /* Position to the right of the icon */
+            margin-left: -08px; /* Fine-tune the spacing */
+            border-radius: 0 4px 4px 0; /* Adjust border-radius for the right-aligned dropdown */
+            white-space: nowrap; /* Prevent text from wrapping */
+            position: absolute;
+        }
+        /* Base tooltip styling for minimized sidebar */
+        .nav-links li a::after {
+            content: attr(data-tooltip); /* Use the value of the 'data-tooltip' attribute */
+            position: absolute;
+            left: 50px; /* Position the tooltip slightly to the right of the icon */
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            background-color: var(--primary-color); /* Tooltip background */
+            color: #fff; /* Tooltip text color */
+            padding: 5px 10px; /* Tooltip padding */
+            border-radius: 5px; /* Rounded corners for tooltip */
+            opacity: 0; /* Hide tooltip by default */
+            visibility: hidden; /* Hide tooltip by default */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition for tooltip visibility */
+            z-index: 9999; /* Ensure tooltip is on top of other elements */
+        }
+        /* Show tooltip when minimized and hovering over the link */
+        nav.close .nav-links li a:hover::after {
+            opacity: 1; /* Show tooltip on hover */
+            visibility: visible; /* Make tooltip visible on hover */
+        }
+          /* Base styling for the chevron icon */
+          .nav-links li a .fas.fa-chevron-down {
+              margin-left: auto; /* Aligns the icon to the right within the link */
+              transition: visibility 0.3s ease, opacity 0.3s ease; /* Smooth transition for visibility and opacity */
+          }
+
+          /* Hide chevron icon for minimized sidebar */
+          nav.close .nav-links li a .fas.fa-chevron-down {
+              visibility: hidden; /* Hide the chevron icon */
+              opacity: 0; /* Make the chevron icon fully transparent */
+          }
+
+          /* Show chevron icon for expanded sidebar */
+          nav:not(.close) .nav-links li a .fas.fa-chevron-down {
+              visibility: visible; /* Show the chevron icon */
+              opacity: 1; /* Make the chevron icon fully opaque */
+          }
+          .table-overlay {
+    position: relative;
+    opacity: 0.7;
+    pointer-events: none;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.row-added {
+    animation: fadeIn 1s ease;
+    background-color: rgba(0, 255, 0, 0.1);
+}
+
+.row-deleted {
+    animation: fadeOut 1s ease;
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.row-updated {
+    animation: fadeIn 1s ease;
+    background-color: rgba(255, 255, 0, 0.1);
+}
+select.loading, input.loading {
+    opacity: 0.8;
+    background: linear-gradient(90deg, #f0f0f0 25%, transparent 25%, transparent 50%, #f0f0f0 50%, #f0f0f0 75%, transparent 75%);
+    background-size: 20px 20px;
+    animation: loading-stripe 1s linear infinite;
+    cursor: wait;
+}
+
+@keyframes loading-stripe {
+    0% { background-position: 0 0; }
+    100% { background-position: 20px 0; }
+}
+
+/* Smooth dropdown transitions */
+select, input[type="date"], input[type="text"], textarea {
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+select:focus, input[type="date"]:focus, input[type="text"]:focus, textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(102, 204, 0, 0.3);
+    outline: none;
+    transform: scale(1.02);
+}
+
+body.dark select:focus, body.dark input[type="date"]:focus, 
+body.dark input[type="text"]:focus, body.dark textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(106, 90, 205, 0.3);
+}
+
+/* Modal form smooth transitions */
+.question-section {
+    transition: all 0.3s ease;
+    opacity: 1;
+    max-height: 2000px;
+    overflow: visible;
+}
+
+.question-section[style*="display: none"] {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+/* Button hover effects */
+button {
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Eval form button styling */
+.eval-form-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.eval-form-button:hover {
+    background-color: var(--button-hover-light);
+    transform: translateY(-1px);
+}
+
+.eval-form-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+body.dark .eval-form-button {
+    background-color: var(--primary-color);
+}
+
+body.dark .eval-form-button:hover {
+    background-color: var(--button-hover-dark);
+}
+
+/* Status badge styles for better performance */
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.status-completed {
+    background-color: green;
+    color: white;
+}
+
+.status-taken {
+    background-color: red;
+    color: white;
+}
+
+.status-vacant {
+    background-color: orange;
+    color: black;
+}
+
+.status-incomplete {
+    background-color: yellow;
+    color: black;
+}
+
+.status-default {
+    background-color: transparent;
+    color: black;
+}
+
+</style>
+
+
+</head>
+
+
+<body>
+    <nav>
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV9HzI8S-ghatJ1abB92mTWnJ41_YTO4lyhQ&s" alt="Logo" loading="lazy" decoding="async">
+            </div>
+            <span class="logo_name">Dashboard</span>
+        </div>
+
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li>
+                    <a href="#" id="dashboard-link" data-tooltip="Dashboard">
+                        <i class="fas fa-server"></i>
+                        <span class="link-name">Dashboard</span>
+                    </a>   
+                </li>
+                <li>
+                    <a href="#" id="analysis-link" data-tooltip="Analysis">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="link-name">Analysis</span>
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" id="sales-dump-link" data-tooltip="Sales Dump">
+                        <i class="fas fa-headphones"></i>
+                        <span class="link-name">Sales Dump</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" id="sales-dump-ffh" data-tooltip="FFH">FFH</a></li>
+                        <li><a href="#" id="sales-dump-wls" data-tooltip="WLS">WLS</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" id="dnc-link" data-tooltip="DNC">
+                        <i class="fas fa-phone-slash"></i>
+                        <span class="link-name">DNC</span>
+                    </a>
+                </li>
+            </ul>
+            <ul>
+                <li class="mode">
+                    <a href="#">
+                        <i class="fas fa-moon"></i>
+                        <span class="link-name">Dark Mode</span>
+                    </a>
+                    <div class="mode-toggle">
+                        <span class="switch"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+        <div class="top">
+            <i class="fas fa-bars sidebar-toggle" ></i>
+            
+        </div>
+        <div class="dash-content">
+            <div id="content">
+                <!-- Content will be loaded here dynamically -->
+            </div>
+        </div>
+    </section>
+
+<script>
+    // Global variable to track the current page
+    let page = 'dashboard';  // Default to 'dashboard'
+
+    // Handle dark mode and sidebar toggle
+    const body = document.querySelector("body"),
+        modeToggle = body.querySelector(".mode-toggle"),
+        sidebar = body.querySelector("nav"),
+        sidebarToggle = body.querySelector(".sidebar-toggle");
+
+    let getMode = localStorage.getItem("mode");
+    if (getMode && getMode === "dark") {
+        body.classList.toggle("dark");
+    }
+
+    let getStatus = localStorage.getItem("status");
+    if (getStatus && getStatus === "close") {
+        sidebar.classList.toggle("close");
+    }
+
+    modeToggle.addEventListener("click", () => {
+        body.classList.toggle("dark");
+        localStorage.setItem("mode", body.classList.contains("dark") ? "dark" : "light");
+    });
+
+    sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("close");
+        localStorage.setItem("status", sidebar.classList.contains("close") ? "close" : "open");
+    });
+
+    // Add Event Listeners for navigation
+    document.getElementById('dashboard-link').addEventListener('click', (event) => {
+        event.preventDefault();
+        loadPage('dashboard');
+    });
+
+    document.getElementById('analysis-link').addEventListener('click', (event) => {
+        event.preventDefault();
+        loadPage('analysis');
+    });
+
+    document.getElementById('sales-dump-link').addEventListener('click', (event) => {
+        event.preventDefault();
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
+    });
+
+    document.getElementById('sales-dump-ffh').addEventListener('click', (event) => {
+        event.preventDefault();
+        loadPage('sales-dump-ffh');
+    });
+
+    document.getElementById('sales-dump-wls').addEventListener('click', (event) => {
+        event.preventDefault();
+        loadPage('sales-dump-wls');
+    });
+
+    document.getElementById('dnc-link').addEventListener('click', (event) => {
+        event.preventDefault();
+        loadPage('dnc');
+    });
+
+    let pollingInterval = null; // ✅ Global declaration (Fixes ReferenceError)
+    // Defer non-critical initialization
+    requestAnimationFrame(() => {
+        loadPage('dashboard');
+    });
+    
+    let manuallyUpdatedRows = new Set();
+
+    // Lazy loading variables
+    const ROWS_PER_BATCH = 50;
+    let currentBatch = 0;
+    let isLoading = false;
+
+    // Variables to track the state of data
+    let allData = [];
+    let uniqueIds = [];
+    let svRoster = [];
+    let activeFFHFilter = 'ALL';  // Global variable to store the current filter for FFH
+    let activeWLSFilter = 'ALL';  // Global variable to store the current filter for WLS
+
+  
+
+function createTableRowFFH(rowData, uniqueId) {
+    const tr = document.createElement('tr');
+    tr.dataset.uniqueId = uniqueId;
+
+    // Define the correct order of columns
+    const columnOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17];
+
+    columnOrder.forEach((colIndex) => {
+        const td = document.createElement('td');
+
+        if (colIndex === 0) {
+            // Status column - directly use the value from Sheet (Column B)
+            td.textContent = rowData[colIndex] || '';
+            console.log(`Setting initial status for row ${uniqueId} to: ${rowData[colIndex]}`);
+        } else if (colIndex === 2) {
+            td.appendChild(createDateValidatedInput(rowData[colIndex], uniqueId, rowData));
+        } else {
+            td.textContent = rowData[colIndex] || '';
+        }
+
+        tr.appendChild(td);
+    });
+
+    // Add Validation form button
+    const actionTd = document.createElement('td');
+    const actionButton = document.createElement('button');
+    actionButton.textContent = 'Open Eval Form';
+    actionButton.className = 'eval-form-button';
+    updateButtonState(actionButton, null, rowData[2]);
+    actionButton.addEventListener('click', () => {
+        console.log('Opening eval form for row:', rowData);
+        openFormFFH(rowData);
+    });
+    actionTd.appendChild(actionButton);
+    tr.appendChild(actionTd);
+
+    return tr;
+}
+
+function updateTableRowFFH(index, rowData, uniqueId, assigneeEmail) {
+    const existingRow = document.querySelector(`tr[data-unique-id="${uniqueId}"]`);
+    if (!existingRow) return;
+
+    const columnOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17];
+
+    columnOrder.forEach((colIndex, tdIndex) => {
+        const td = existingRow.children[tdIndex];
+        
+        if (td) {
+            if (colIndex === 0) {
+                // Status column - directly update with the value from Sheet (Column B)
+                const status = rowData[colIndex] || '';
+                td.textContent = status;
+                applyStatusColor(td, status); // Apply color dynamically based on status
+                console.log(`Updating status for row ${uniqueId} to: ${status}`);
+            } else if (colIndex === 2) {
+                const input = td.querySelector('input');
+                if (input) {
+                    input.value = rowData[colIndex] ? formatDateForInput(rowData[colIndex]) : '';
+                }
+            } else {
+                td.textContent = rowData[colIndex] || '';
+            }
+        }
+    });
+
+    // Update the "Open Eval Form" button
+    const lastTd = existingRow.lastElementChild;
+    let actionButton = lastTd.querySelector('.eval-form-button');
+    if (!actionButton) {
+        actionButton = document.createElement('button');
+        actionButton.textContent = 'Open Eval Form';
+        actionButton.className = 'eval-form-button';
+        actionButton.addEventListener('click', () => openFormFFH(rowData));
+        lastTd.appendChild(actionButton);
+    }
+    updateButtonState(actionButton, null, rowData[2]);
+}
+
+function createTableRow(rowData, uniqueId) {
+    const tr = document.createElement('tr');
+    tr.dataset.uniqueId = uniqueId;
+
+    // Define the correct order of columns
+    const columnOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17];
+
+    columnOrder.forEach((colIndex) => {
+        const td = document.createElement('td');
+
+        if (colIndex === 0) {
+            // Status column - directly use the value from Sheet (Column B)
+            td.textContent = rowData[colIndex] || '';
+            console.log(`Setting initial status for row ${uniqueId} to: ${rowData[colIndex]}`);
+        } else if (colIndex === 1) {
+            td.appendChild(createSVNameDropdown(rowData[colIndex], uniqueId, rowData));
+        } else if (colIndex === 2) {
+            td.appendChild(createDateValidatedInput(rowData[colIndex], uniqueId, rowData));
+        } else {
+            td.textContent = rowData[colIndex] || '';
+        }
+
+        tr.appendChild(td);
+    });
+
+    // Add Validation form button
+    const actionTd = document.createElement('td');
+    const actionButton = document.createElement('button');
+    actionButton.textContent = 'Open Eval Form';
+    actionButton.className = 'eval-form-button';
+    updateButtonState(actionButton, rowData[1], rowData[2]);
+    actionButton.addEventListener('click', () => {
+        console.log('Opening eval form for row:', rowData);
+        openFormWLS(rowData);
+    });
+    actionTd.appendChild(actionButton);
+    tr.appendChild(actionTd);
+
+    return tr;
+}
+
+// Helper function to update locked rows
+function updateLockedRows(takenRows) {
+    if (!takenRows) return;
+    
+    takenRows.forEach(row => {
+        const tr = document.querySelector(`tr[data-unique-id="${row.id}"]`);
+        if (!tr) return;
+
+        const dropdown = tr.querySelector('select');
+        const dateInput = tr.querySelector('input[type="date"]');
+        const isTakenByOther = row.assignee && row.assignee !== userEmail;
+
+        if (dropdown) {
+            dropdown.disabled = isTakenByOther;
+            if (isTakenByOther) {
+                dropdown.title = `This row is being edited by ${row.assignee}`;
+            } else {
+                dropdown.title = '';
+                dropdown.parentElement.style.backgroundColor = '';
+            }
+            if (row.svName && dropdown.value !== row.svName) {
+                dropdown.value = row.svName;
+            }
+        }
+
+        if (dateInput) {
+            dateInput.disabled = isTakenByOther;
+            if (isTakenByOther) {
+                dateInput.title = `This row is being edited by ${row.assignee}`;
+            } else {
+                dateInput.title = '';
+                dateInput.parentElement.style.backgroundColor = '';
+            }
+        }
+
+        const statusCell = tr.cells[0];
+        if (statusCell) {
+            console.log(`Updating status for row ${row.id} to: ${row.status}`);
+            statusCell.textContent = row.status;
+        }
+
+        tr.dataset.assignee = row.assignee || '';
+    });
+}
+
+   // Load Page Content dynamically and update the current 'page' variable
+async function loadPage(newPage) {
+    page = newPage;
+    stopPolling(); // ✅ Stop old polling before loading new page
+
+    try {
+        console.log(`📄 Loading page: ${page}`);
+        const contentElement = document.getElementById('content');
+
+        if (!contentElement) {
+            console.error('❌ Content element not found.');
+            return;
+        }
+
+       
+
+        // Fetch page content from Apps Script
+        const html = await new Promise((resolve, reject) => {
+            google.script.run
+                .withSuccessHandler(resolve)
+                .withFailureHandler(reject)
+                .getPage(page);
+        });
+
+        contentElement.innerHTML = html;
+        console.log(`✅ Page loaded successfully: ${page}`);
+
+        if (page === 'sales-dump-ffh') {
+            // Add search bar to FFH page
+            const filterButtons = document.querySelector('.filter-buttons-FFH');
+            if (filterButtons && !document.getElementById('searchInputFFH')) {
+                const searchContainer = document.createElement('div');
+                searchContainer.className = 'search-container';
+                searchContainer.style.marginBottom = '15px';
+                searchContainer.innerHTML = '<input type="text" id="searchInputFFH" placeholder="Search by Agent Name, xID, BAN, Phone Number..." style="width: 300px; padding: 10px; border: 1px solid var(--border-color-light); border-radius: 5px; font-size: 14px;">';
+                filterButtons.parentNode.insertBefore(searchContainer, filterButtons);
+            }
+            await loadSalesDataFFH(); // ✅ Load data first
+            attachFFHListeners();
+            updateToggleButtonTextFFH();
+            startPolling(); // ✅ Then start polling
+        } else if (page === 'sales-dump-wls') {
+            // Add search bar to WLS page
+            const filterButtons = document.querySelector('.filter-buttons-WLS');
+            if (filterButtons && !document.getElementById('searchInputWLS')) {
+                const searchContainer = document.createElement('div');
+                searchContainer.className = 'search-container';
+                searchContainer.style.marginBottom = '15px';
+                searchContainer.innerHTML = '<input type="text" id="searchInputWLS" placeholder="Search by Agent Name, xID, BAN, Phone Number..." style="width: 300px; padding: 10px; border: 1px solid var(--border-color-light); border-radius: 5px; font-size: 14px;">';
+                filterButtons.parentNode.insertBefore(searchContainer, filterButtons);
+            }
+            await loadSalesDataWLS();
+            attachWLSListeners();
+            updateToggleButtonTextWLS();
+            startPolling();
+        } else if (page === 'dnc') {
+            await loadDNCdata();
+            // Add search event listener after data is loaded
+            setTimeout(() => {
+                const searchInput = document.getElementById('searchInputDNC');
+                if (searchInput) {
+                    searchInput.addEventListener('input', handleDNCSearch);
+                }
+            }, 100);
+            startPolling();
+        } else {
+            stopPolling(); // Stop polling if on a non-relevant page
+        }
+    } catch (error) {
+        console.error('❌ Error loading page:', error);
+        document.getElementById('content').innerHTML = '<p>Error loading content. Please try again.</p>';
+    }
+}
+
+
+
+function updateToggleButtonTextFFH() {
+    const toggleButton = document.getElementById('dataSourceToggleFFH');
+    if (!toggleButton) {
+        console.error('Toggle button for FFH not found.');
+        return;
+    }
+
+    // Update the button text based on the current data source
+    toggleButton.textContent = currentDataSourceFFH === 'current' ? 'Backlog' : 'Current';
+}
+
+
+
+// Global variable for userEmail
+let userEmail = null; // Initialize to null
+
+// Load and render Sales Data for WLS
+function loadSalesDataWLS(isAutoRefresh = false) {
+    console.log("📡 Fetching WLS data...");
+    if (!isAutoRefresh) showTableLoader(); // Only show loader if not auto-refresh
+
+    // Determine the correct data function based on the data source
+    const dataFunction = currentDataSourceWLS === 'current' ? 'getSalesData' : 'getBacklogData';
+
+    google.script.run
+        .withSuccessHandler((result) => {
+            console.log("✅ WLS Data received:", result);
+            if (!isAutoRefresh) hideTableLoader(); // Hide loader if not auto-refresh
+
+            if (result && result.data && result.data.length > 0) {
+                allData = result.data;
+                uniqueIds = result.ids;
+                userEmail = result.userEmail;
+                allData.evalData = result.evalData;
+                svRoster = result.svRoster;
+
+                requestAnimationFrame(() => {
+                    allData.forEach((row, index) => {
+                        const uniqueId = uniqueIds[index];
+                        updateTableRow(index, row, uniqueId, userEmail);
+                    });
+                });
+
+
+                const savedFilter = localStorage.getItem('activeWLSFilter') || 'ALL';
+
+                
+                filterDataWLS(savedFilter);
+            } else {
+                console.warn("⚠️ No WLS data available.");
+                if (!isAutoRefresh) renderEmptyTableWLS();
+            }
+        })
+        .withFailureHandler((error) => {
+            console.error("❌ Error fetching WLS data:", error);
+            if (!isAutoRefresh) {
+                hideTableLoader();
+                renderEmptyTableWLS();
+            }
+        })[dataFunction](); // Dynamically call either getSalesData or getBacklogData
+}
+
+function loadSalesDataFFH(isAutoRefresh = false) {
+    console.log("📡 Fetching FFH data...");
+    if (!isAutoRefresh) showTableLoader();
+
+    // Determine the correct data function based on the data source
+    const dataFunction = currentDataSourceFFH === 'current' ? 'getSalesData' : 'getBacklogData';
+
+    google.script.run
+        .withSuccessHandler((result) => {
+            console.log("✅ FFH Data received:", result);
+            if (!isAutoRefresh) hideTableLoader();
+
+            if (result && result.data && result.data.length > 0) {
+                allData = result.data;
+                uniqueIds = result.ids;
+                userEmail = result.userEmail;
+                allData.evalData = result.evalData;
+                
+                requestAnimationFrame(() => {
+                    allData.forEach((row, index) => {
+                        const uniqueId = uniqueIds[index];
+                        updateTableRowFFH(index, row, uniqueId, userEmail);
+                    });
+                });
+
+             
+                const savedFilter = localStorage.getItem('activeFFHFilter') || 'ALL';
+
+                
+                filterDataFFH(savedFilter);
+            } else {
+                console.warn("⚠️ No FFH data available.");
+                if (!isAutoRefresh) renderEmptyTableFFH();
+            }
+        })
+        .withFailureHandler((error) => {
+            console.error("❌ Error fetching FFH data:", error);
+            if (!isAutoRefresh) {
+                hideTableLoader();
+                renderEmptyTableFFH();
+            }
+        })[dataFunction](); // Dynamically call either getSalesData or getBacklogData
+}
+
+
+
+    // Utility to format date for input field
+    function formatDateForInput(dateString) {
+        if (!dateString) return ''; // Handle empty dates
+        const date = new Date(dateString);
+        if (isNaN(date)) {
+            return '';
+        }
+        const year = date.getFullYear();
+        const month = ('0' + (date.getMonth() + 1)).slice(-2); // Pad month with leading zero
+        const day = ('0' + date.getDate()).slice(-2); // Pad day with leading zero
+        return `${year}-${month}-${day}`;  // Corrected with backticks for string interpolation
+    }
+
+    // Filter data for WLS
+function filterDataWLS(category) {
+    localStorage.setItem('activeWLSFilter', category);
+    console.log('Filtering data, category:', category, 'Data source:', currentDataSource, 'Data length:', allData.length);
+    if (!allData || allData.length === 0) {
+        console.log('No data available for filtering');
+        renderEmptyTable();
+        return;
+    }
+
+    let filteredData = [];
+    let filteredIds = [];
+    // Define the order of categories
+    const requiredCategories = ['KOODO_ADD_A_LINE', 'KOODO_UPSELL', 'WIRELESS_ACQUISITION', 'WIRELESS_RENEWAL'];
+    
+    // Define WLS categories (adjust this list if needed)
+    const wlsCategories = ['KOODO_ADD_A_LINE', 'KOODO_UPSELL', 'WIRELESS_ACQUISITION', 'WIRELESS_RENEWAL'];
+
+    allData.forEach((row, index) => {
+        const rowCategory = row[9]; // Assuming category is in the 10th column (index 9)
+        
+        if (currentDataSource === 'backlog') {
+            // For backlog, only include WLS categories
+            if (wlsCategories.includes(rowCategory)) {
+                if (category === 'ALL' || rowCategory === category) {
+                    filteredData.push(row);
+                    filteredIds.push(uniqueIds[index]);
+                }
+            }
+        } else {
+            // For current data, keep the existing logic
+            if (category === 'ALL' && requiredCategories.includes(rowCategory)) {
+                filteredData.push(row);
+                filteredIds.push(uniqueIds[index]);
+            } else if (rowCategory === category) {
+                filteredData.push(row);
+                filteredIds.push(uniqueIds[index]);
+            }
+        }
+    });
+
+    // Sort the filtered data
+    let sortedIndexes = filteredData.map((_, index) => index).sort((a, b) => {
+        const indexA = requiredCategories.indexOf(filteredData[a][9]);
+        const indexB = requiredCategories.indexOf(filteredData[b][9]);
+
+        if (indexA !== indexB) {
+            return indexA - indexB;
+        }
+
+        const dateA = new Date(filteredData[a][3] || 0);
+        const dateB = new Date(filteredData[b][3] || 0);
+        return dateB - dateA;
+    });
+
+    filteredData = sortedIndexes.map(index => filteredData[index]);
+    filteredIds = sortedIndexes.map(index => filteredIds[index]);
+
+    // Apply search filter if there's a search term
+    const searchInput = document.getElementById('searchInputWLS');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    if (searchTerm) {
+        const searchFiltered = [];
+        const searchFilteredIds = [];
+        
+        filteredData.forEach((row, index) => {
+            const searchableText = [
+                row[15] || '', // Agent Name
+                row[4] || '',  // xID
+                row[5] || '',  // BAN
+                row[6] || '',  // Phone Number
+                row[7] || '',  // Sold BAN
+                row[8] || ''   // Sold Phone
+            ].join(' ').toLowerCase();
+            
+            if (searchableText.includes(searchTerm)) {
+                searchFiltered.push(row);
+                searchFilteredIds.push(filteredIds[index]);
+            }
+        });
+        
+        filteredData = searchFiltered;
+        filteredIds = searchFilteredIds;
+    }
+
+    console.log('Filtered data length:', filteredData.length);
+    if (filteredData.length > 0) {
+        renderTableWLS(filteredData, filteredIds);
+        // Apply status colors immediately after rendering
+        requestAnimationFrame(() => {
+            document.querySelectorAll('#salesTableWLS tbody tr').forEach(row => {
+                const statusCell = row.cells[0];
+                if (statusCell) {
+                    applyStatusColor(statusCell, statusCell.textContent.trim());
+                }
+            });
+        });
+    } else {
+        console.log('No data after filtering');
+        renderEmptyTable();
+    }
+}
+
+
+// Render table for WLS (Hiding 'Order ID' and 'Due Date')
+function renderTableWLS(data, filteredIds) {
+    console.log('Rendering table with data source:', currentDataSource, 'Data length:', data.length);
+    const tableBody = document.getElementById('salesTableWLS').querySelector('tbody');
+    const thead = document.getElementById('salesTableWLS').querySelector('thead');
+
+    // Reset batch loading
+    currentBatch = 0;
+    isLoading = false;
+
+    // Use document fragment for better performance
+    const fragment = document.createDocumentFragment();
+
+    // Create the table header if it is empty
+    if (thead.innerHTML === '') {
+        const headerRow = document.createElement('tr');
+        const headers = ['Status', 'SV Name', 'Date Validated', 'Sale Date', 'xID', 'BAN', 'Phone Number', 
+                         'Sold BAN', 'Sold Phone', 'CSS Portfolio', 'Product ID', 'Multiple Sales', 
+                         'Number of Sales', 'Agent Name', 'Immediate Supervisor', 'Priority Level', 'Validation Form'];
+
+        headers.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+    }
+
+    // Handle case where no data is available
+    if (!data || data.length === 0) {
+        console.log('No data available for rendering');
+        tableBody.innerHTML = '<tr><td colspan="17">No Data Available</td></tr>';
+        return;
+    }
+
+    // Lazy load initial batch
+    tableBody.innerHTML = '';
+    renderBatchWLS(data, filteredIds, tableBody);
+    
+    // Add scroll listener for lazy loading
+    const tableContainer = tableBody.closest('.table-container') || window;
+    tableContainer.addEventListener('scroll', () => lazyLoadWLS(data, filteredIds, tableBody));
+
+    console.log('Table rendering complete');
+}
+
+
+function createSVNameDropdown(cell, uniqueId, row) {
+    const select = document.createElement('select');
+    select.id = 'dropdown_' + uniqueId;
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.text = '-- Select Agent --';
+    select.appendChild(defaultOption);
+
+    svRoster.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.text = name;
+        if (name === cell) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+
+    select.value = cell || '';
+
+    const assigneeEmail = row[18];
+    if (assigneeEmail && assigneeEmail !== userEmail) {
+        select.disabled = true;
+        select.title = `This row is being edited by ${assigneeEmail}`;
+    }
+
+    select.addEventListener('change', (event) => {
+        const selectedName = event.target.value;
+        const currentRow = select.closest('tr');
+        const statusCell = currentRow.cells[0];
+        const originalValue = cell || '';
+        
+        if (assigneeEmail && assigneeEmail !== userEmail) {
+            alert(`This row is being edited by ${assigneeEmail}. You cannot make changes.`);
+            select.value = originalValue;
+            return;
+        }
+        
+        // Instant UI updates
+        select.classList.add('loading');
+        row[1] = selectedName;
+        const actionButton = currentRow.querySelector('.eval-form-button');
+        if (actionButton) {
+            updateButtonState(actionButton, selectedName, row[2]);
+        }
+        statusCell.textContent = selectedName ? 'Taken' : 'Vacant';
+        applyStatusColor(statusCell, selectedName ? 'Taken' : 'Vacant');
+        
+        // Background sync with rate limiting
+        setTimeout(() => {
+            const updateFunction = currentDataSourceWLS === 'current' ? 'updateSVName' : 'updateBacklogSVName';
+            google.script.run
+                .withSuccessHandler((result) => {
+                    select.classList.remove('loading');
+                    if (result && result.status) {
+                        statusCell.textContent = result.status;
+                        applyStatusColor(statusCell, result.status);
+                        if (result.assignee) {
+                            currentRow.dataset.assignee = result.assignee;
+                        }
+                    }
+                })
+                .withFailureHandler((error) => {
+                    console.error(`Failed to update ${currentDataSource}:`, error);
+                    select.classList.remove('loading');
+                    if (error.message && error.message.includes('429')) {
+                        statusCell.textContent = 'Rate Limited';
+                    } else {
+                        statusCell.textContent = row[0] || 'Error';
+                        select.value = originalValue;
+                        row[1] = originalValue;
+                        if (actionButton) {
+                            updateButtonState(actionButton, originalValue, row[2]);
+                        }
+                    }
+                    applyStatusColor(statusCell, statusCell.textContent);
+                })[updateFunction](uniqueId, selectedName);
+        }, Math.random() * 500 + 200);
+    });
+
+    return select;
+}
+
+function createDateValidatedInput(cell, uniqueId, row) {
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.value = cell ? formatDateForInput(cell) : '';
+
+    const assigneeEmail = row[18];
+    if (assigneeEmail && assigneeEmail !== userEmail) {
+        input.disabled = true;
+        input.title = `This row is being edited by ${assigneeEmail}`;
+    }
+
+    input.addEventListener('change', (event) => {
+        const selectedDate = event.target.value;
+        const currentRow = input.closest('tr');
+        const statusCell = currentRow.cells[0];
+        const originalValue = cell ? formatDateForInput(cell) : '';
+
+        if (assigneeEmail && assigneeEmail !== userEmail) {
+            alert(`This row is being edited by ${assigneeEmail}. You cannot make changes.`);
+            input.value = originalValue;
+            return;
+        }
+
+        // Instant UI updates
+        input.classList.add('loading');
+        row[2] = selectedDate;
+        const actionButton = currentRow.querySelector('.eval-form-button');
+        if (actionButton) {
+            updateButtonState(actionButton, row[1], selectedDate);
+        }
+        
+        // Background sync with rate limiting
+        setTimeout(() => {
+            const updateFunction = currentDataSourceWLS === 'current' ? 'updateDateValidated' : 'updateBacklogDateValidatedFFH';
+            google.script.run
+                .withSuccessHandler((result) => {
+                    input.classList.remove('loading');
+                    if (result && result.status) {
+                        statusCell.textContent = result.status;
+                        applyStatusColor(statusCell, result.status);
+                        if (result.assignee) {
+                            currentRow.dataset.assignee = result.assignee;
+                        }
+                    }
+                })
+                .withFailureHandler((error) => {
+                    console.error(`Failed to update ${currentDataSourceWLS} date:`, error);
+                    input.classList.remove('loading');
+                    if (error.message && error.message.includes('429')) {
+                        statusCell.textContent = 'Rate Limited';
+                        applyStatusColor(statusCell, 'Rate Limited');
+                    } else {
+                        input.value = originalValue;
+                        row[2] = originalValue;
+                        statusCell.textContent = row[0] || 'Error';
+                        applyStatusColor(statusCell, row[0] || 'Error');
+                        if (actionButton) {
+                            updateButtonState(actionButton, row[1], originalValue);
+                        }
+                    }
+                })[updateFunction](uniqueId, selectedDate);
+        }, Math.random() * 500 + 200);
+    });
+
+    return input;
+}
+
+function createDateValidatedInputFFH(cell, uniqueId, row) {
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.value = cell ? formatDateForInput(cell) : '';
+
+    const assigneeEmail = row[18];
+    if (assigneeEmail && assigneeEmail !== userEmail) {
+        input.disabled = true;
+        input.title = `This row is being edited by ${assigneeEmail}`;
+    }
+
+    input.addEventListener('change', (event) => {
+        const selectedDate = event.target.value;
+        const currentRow = input.closest('tr');
+        const statusCell = currentRow.cells[0];
+        const originalValue = cell ? formatDateForInput(cell) : '';
+
+        if (assigneeEmail && assigneeEmail !== userEmail) {
+            alert(`This row is being edited by ${assigneeEmail}. You cannot make changes.`);
+            input.value = originalValue;
+            return;
+        }
+
+        // Instant UI updates
+        input.classList.add('loading');
+        row[2] = selectedDate;
+        const actionButton = currentRow.querySelector('.eval-form-button');
+        if (actionButton) {
+            actionButton.disabled = !selectedDate;
+        }
+        
+        // Background sync with rate limiting
+        setTimeout(() => {
+            const updateFunction = currentDataSourceFFH === 'current' ? 'updateDateValidated' : 'updateBacklogDateValidatedFFH';
+            google.script.run
+                .withSuccessHandler((result) => {
+                    input.classList.remove('loading');
+                    if (result && result.status) {
+                        statusCell.textContent = result.status;
+                        applyStatusColor(statusCell, result.status);
+                        if (result.assignee) {
+                            currentRow.dataset.assignee = result.assignee;
+                        }
+                    }
+                })
+                .withFailureHandler((error) => {
+                    console.error(`Failed to update ${currentDataSourceFFH} date:`, error);
+                    input.classList.remove('loading');
+                    if (error.message && error.message.includes('429')) {
+                        statusCell.textContent = 'Rate Limited';
+                        applyStatusColor(statusCell, 'Rate Limited');
+                    } else {
+                        input.value = originalValue;
+                        row[2] = originalValue;
+                        statusCell.textContent = row[0] || 'Error';
+                        applyStatusColor(statusCell, row[0] || 'Error');
+                        if (actionButton) {
+                            actionButton.disabled = !originalValue;
+                        }
+                    }
+                })[updateFunction](uniqueId, selectedDate);
+        }, Math.random() * 500 + 200);
+    });
+
+    return input;
+}
+
+function showRowLoading(row) {
+    row.classList.add('table-overlay');
+}
+
+function hideRowLoading(row) {
+    row.classList.remove('table-overlay');
+}
+function updateLocalData(uniqueId, field, value) {
+    const rowIndex = allData.findIndex(row => row[0] === uniqueId);
+    if (rowIndex !== -1) {
+        if (field === 'svName') {
+            allData[rowIndex][1] = value;
+        } else if (field === 'dateValidated') {
+            allData[rowIndex][2] = value;
+        }
+    }
+}
+
+function showTableLoader() {
+    const tableBody = document.getElementById('salesTableWLS').querySelector('tbody');
+    tableBody.innerHTML = '<tr><td colspan="16" style="text-align: center;">Loading...</td></tr>';
+}
+
+function hideTableLoader() {
+    // This function is now empty as the loader is replaced when rendering the table
+}
+
+function renderEmptyTableFFH() {
+    const table = document.getElementById('salesTableFFH');
+    if (!table) {
+        console.error('FFH table not found');
+        return;
+    }
+    
+    const tableBody = table.querySelector('tbody');
+    if (tableBody) {
+        tableBody.innerHTML = '<tr><td colspan="16">No Data Available</td></tr>';
+    }
+}
+function filterDataFFH(category) {
+    
+    localStorage.setItem('activeFFHFilter', category);
+    console.log('Filtering FFH data, category:', category, 'Data source:', currentDataSourceFFH);
+    if (!allData || allData.length === 0) {
+        console.log('No data available for filtering');
+        renderEmptyTableFFH();
+        return;
+    }
+
+    let filteredData = [];
+    let filteredIds = [];
+    const ffhCategories = ['TTV ACQUISITION', 'LOCAL', 'SECURITY WEST'];
+    
+    // Convert TTV_ACQUISITION to TTV ACQUISITION if it comes as a parameter
+    const normalizedCategory = category === 'TTV_ACQUISITION' ? 'TTV ACQUISITION' : category;
+    
+    allData.forEach((row, index) => {
+        const rowCategory = row[9]; // CSS Portfolio column
+        
+        // Special handling for TTV_ACQUISITION in the data
+        let normalizedRowCategory = rowCategory.trim().toUpperCase();
+        if (normalizedRowCategory === 'TTV_ACQUISITION') {
+            normalizedRowCategory = 'TTV ACQUISITION';
+        }
+        
+        const normalizedFilterCategory = normalizedCategory.trim().toUpperCase();
+        
+        console.log('Processing row:', {
+            original: rowCategory,
+            normalized: normalizedRowCategory,
+            filterCategory: normalizedFilterCategory
+        });
+
+        if (currentDataSourceFFH === 'backlog') {
+            // For ALL category
+            if (normalizedFilterCategory === 'ALL') {
+                if (ffhCategories.some(cat => 
+                    normalizedRowCategory === cat.trim().toUpperCase() || 
+                    (normalizedRowCategory === 'TTV_ACQUISITION' && cat === 'TTV ACQUISITION'))) {
+                    filteredData.push(row);
+                    filteredIds.push(uniqueIds[index]);
+                }
+            } 
+            // For specific categories
+            else if (normalizedRowCategory === normalizedFilterCategory || 
+                    (normalizedFilterCategory === 'TTV ACQUISITION' && normalizedRowCategory === 'TTV_ACQUISITION')) {
+                filteredData.push(row);
+                filteredIds.push(uniqueIds[index]);
+            }
+        } else {
+            // Current data source logic
+            if ((normalizedFilterCategory === 'ALL' && 
+                ffhCategories.some(cat => normalizedRowCategory === cat.trim().toUpperCase() || 
+                    (normalizedRowCategory === 'TTV_ACQUISITION' && cat === 'TTV ACQUISITION'))) || 
+                normalizedRowCategory === normalizedFilterCategory || 
+                (normalizedFilterCategory === 'TTV ACQUISITION' && normalizedRowCategory === 'TTV_ACQUISITION')) {
+                filteredData.push(row);
+                filteredIds.push(uniqueIds[index]);
+            }
+        }
+    });
+
+    // Sort the filtered data
+    let sortedIndexes = filteredData.map((_, index) => index).sort((a, b) => {
+        const dateA = new Date(filteredData[a][3] || 0);
+        const dateB = new Date(filteredData[b][3] || 0);
+        return dateB - dateA;
+    });
+
+    filteredData = sortedIndexes.map(index => filteredData[index]);
+    filteredIds = sortedIndexes.map(index => filteredIds[index]);
+
+    // Apply search filter if there's a search term
+    const searchInput = document.getElementById('searchInputFFH');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    if (searchTerm) {
+        const searchFiltered = [];
+        const searchFilteredIds = [];
+        
+        filteredData.forEach((row, index) => {
+            const searchableText = [
+                row[15] || '', // Agent Name
+                row[4] || '',  // xID
+                row[5] || '',  // BAN
+                row[6] || '',  // Phone Number
+                row[7] || '',  // Sold BAN
+                row[8] || ''   // Sold Phone
+            ].join(' ').toLowerCase();
+            
+            if (searchableText.includes(searchTerm)) {
+                searchFiltered.push(row);
+                searchFilteredIds.push(filteredIds[index]);
+            }
+        });
+        
+        filteredData = searchFiltered;
+        filteredIds = searchFilteredIds;
+    }
+
+    console.log('Filtered data length:', filteredData.length);
+    if (filteredData.length > 0) {
+        renderTableFFH(filteredData, filteredIds);
+        // Apply status colors immediately after rendering
+        requestAnimationFrame(() => {
+            document.querySelectorAll('#salesTableFFH tbody tr').forEach(row => {
+                const statusCell = row.cells[0];
+                if (statusCell) {
+                    applyStatusColor(statusCell, statusCell.textContent.trim());
+                }
+            });
+        });
+    } else {
+        console.log('No data after filtering');
+        renderEmptyTableFFH();
+    }
+}
+
+// Update renderTableFFH function to accept filteredIds parameter
+function renderTableFFH(data, filteredIds) {
+    const table = document.getElementById('salesTableFFH');
+    if (!table) {
+        console.error('FFH table not found');
+        return;
+    }
+
+    const tableBody = table.querySelector('tbody');
+    const thead = table.querySelector('thead');
+
+    if (!tableBody || !thead) {
+        console.error('FFH table body or header not found');
+        return;
+    }
+
+    tableBody.innerHTML = '';
+
+    if (thead.innerHTML === '') {
+        const headerRow = document.createElement('tr');
+        const headers = ['Status', 'SV Name', 'Date Validated', 'Sale Date', 'xID', 'BAN', 'Phone Number',
+                        'Sold BAN', 'Sold Phone', 'CSS Portfolio', 'Product ID', 'Multiple Sales',
+                        'Number of Sales', 'Agent Name', 'Immediate Supervisor', 'Priority Level', 'Validation form'];
+        headers.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+    }
+
+    if (!data || data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="17">No Data Available</td></tr>';
+        return;
+    }
+
+    // Reset batch loading
+    currentBatch = 0;
+    isLoading = false;
+    
+    // Lazy load initial batch
+    renderBatchFFH(data, filteredIds, tableBody);
+    
+    // Add scroll listener for lazy loading
+    const tableContainer = tableBody.closest('.table-container') || window;
+    tableContainer.addEventListener('scroll', () => lazyLoadFFH(data, filteredIds, tableBody));
+}
+
+
+
+let currentDataSourceFFH = 'current'; // 'current' or 'backlog'
+let currentDataSourceWLS = 'current'; // Default to "current"
+
+function toggleDataSourceFFH() {
+    currentDataSourceFFH = currentDataSourceFFH === 'current' ? 'backlog' : 'current';
+    const toggleButton = document.getElementById('dataSourceToggleFFH');
+    if (toggleButton) {
+        toggleButton.textContent = currentDataSourceFFH === 'current' ? 'Backlogs' : 'Current';
+    }
+    console.log('Switching to:', currentDataSourceFFH);
+    loadSalesDataFFH();
+}
+function toggleDataSourceWLS() {
+    currentDataSourceWLS= currentDataSourceWLS === 'current' ? 'backlog' : 'current';
+    const toggleButton = document.getElementById('dataSourceToggleWLS');
+    if (toggleButton) {
+        toggleButton.textContent = currentDataSourceWLS === 'current' ? 'Backlogs' : 'Current';
+    }
+    console.log('Switching to:', currentDataSourceWLS);
+    loadSalesDataWLS();
+}
+
+// Update the entire row when changes are detected
+function updateTableRow(index, rowData, uniqueId, assigneeEmail) {
+    const existingRow = document.querySelector(`tr[data-unique-id="${uniqueId}"]`);
+    if (!existingRow) return;
+
+    const columnOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17];
+
+    columnOrder.forEach((colIndex, tdIndex) => {
+        const td = existingRow.children[tdIndex];
+
+        if (td) {
+            if (colIndex === 0) {
+                // Fetch status from Google Sheets (Column B) and update UI
+                const status = rowData[colIndex] || '';
+                td.textContent = status;
+                applyStatusColor(td, status); // Apply color dynamically
+                console.log(`Updating status for row ${uniqueId} to: ${status}`);
+            } else if (colIndex === 1) {
+                // Update SV Name dropdown
+                const select = td.querySelector('select');
+                if (select) {
+                    select.value = rowData[colIndex] || '';
+                    select.disabled = assigneeEmail && assigneeEmail !== userEmail;
+                }
+            } else if (colIndex === 2) {
+                // Update Date Validated input
+                const input = td.querySelector('input');
+                if (input) {
+                    input.value = rowData[colIndex] ? formatDateForInput(rowData[colIndex]) : '';
+                }
+            } else {
+                // Update other columns normally
+                td.textContent = rowData[colIndex] || '';
+            }
+        }
+    });
+
+    // Update the "Open Eval Form" button
+    const lastTd = existingRow.lastElementChild;
+    let actionButton = lastTd.querySelector('.eval-form-button');
+
+    if (!actionButton) {
+        actionButton = document.createElement('button');
+        actionButton.textContent = 'Open Eval Form';
+        actionButton.className = 'eval-form-button';
+        actionButton.addEventListener('click', () => openFormWLS(rowData));
+        lastTd.appendChild(actionButton);
+    }
+
+    updateButtonState(actionButton, rowData[1], rowData[2]);
+}
+
+// Function to Apply Status Color Dynamically using CSS classes
+function applyStatusColor(td, status) {
+    // Remove existing status classes
+    td.className = td.className.replace(/status-\w+/g, '');
+    
+    // Create or update span
+    let textSpan = td.querySelector('.status-badge') || document.createElement('span');
+    if (!textSpan.classList.contains('status-badge')) {
+        textSpan.className = 'status-badge';
+        textSpan.textContent = td.textContent;
+        td.textContent = '';
+        td.appendChild(textSpan);
+    }
+    
+    // Apply status class
+    const statusClass = {
+        "Completed": "status-completed",
+        "Taken": "status-taken", 
+        "Vacant": "status-vacant",
+        "Incomplete": "status-incomplete"
+    }[status] || "status-default";
+    
+    textSpan.className = `status-badge ${statusClass}`;
+}
+
+
+
+
+
+// Table loader functions
+function showTableLoader() {
+    const wlsTable = document.getElementById('salesTableWLS');
+    const ffhTable = document.getElementById('salesTableFFH');
+    
+    if (wlsTable) {
+        const wlsBody = wlsTable.querySelector('tbody');
+        if (wlsBody) {
+            wlsBody.innerHTML = '<tr><td colspan="16" style="text-align: center;">Loading...</td></tr>';
+        }
+    }
+    
+    if (ffhTable) {
+        const ffhBody = ffhTable.querySelector('tbody');
+        if (ffhBody) {
+            ffhBody.innerHTML = '<tr><td colspan="16" style="text-align: center;">Loading...</td></tr>';
+        }
+    }
+
+    const loader = document.getElementById('tableLoader');
+    if (loader) {
+        loader.style.display = 'flex';
+    }
+}
+
+function hideTableLoader() {
+    const loader = document.getElementById('tableLoader');
+    if (loader) {
+        loader.style.display = 'none';
+    }
+}
+function showEvalFormLoader() {
+    const loader = document.getElementById('evalFormLoader');
+    const progress = document.querySelector('.progress');
+    if (loader) {
+        loader.style.display = 'flex';
+        // Set initial progress
+        progress.style.width = '0%';
+        // Quickly move to 70% to indicate data fetching
+        requestAnimationFrame(() => {
+            progress.style.width = '70%';
+        });
+    }
+}
+
+function completeProgress() {
+    const progress = document.querySelector('.progress');
+    if (progress) {
+        progress.style.width = '100%';
+    }
+}
+
+function hideEvalFormLoader() {
+    const loader = document.getElementById('evalFormLoader');
+    if (loader) {
+        completeProgress();
+        // Short delay to show the completed progress before hiding
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 200);
+    }
+}
+
+let currentDataSource = 'current'; // 'current' or 'backlog'
+const MAX_RETRIES = 3;
+
+function toggleDataSourceWLS() {
+    // Toggle the current data source
+    currentDataSourceWLS = currentDataSourceWLS === 'current' ? 'backlog' : 'current';
+
+    // Reload the WLS data
+    loadSalesDataWLS();
+
+    // Update the toggle button text
+    updateToggleButtonTextWLS();
+}
+
+
+function renderEmptyTable() {
+  const tableBody = document.getElementById('salesTableWLS').querySelector('tbody');
+  tableBody.innerHTML = '<tr><td colspan="16">No Data Available</td></tr>';
+}
+    // Utility function to update button state for WLS and FFH
+function updateButtonState(button, svName, dateValidated) {
+    if (svName !== null) { // For WLS
+        button.disabled = !(svName && dateValidated);
+    } else { // For FFH
+        button.disabled = !dateValidated;
+    }
+}
+
+// DNC-specific constants
+const categoryOptions = ['Valid DNC', 'Invalid DNC'];
+
+const subCategoryMapping = {
+    'Valid DNC': ['Valid DNC', 'Incorrect/No Documentation', 'Not processed/not processed correctly'],
+    'Invalid DNC': [
+        'Soliciting DNC', 'No Sale', 'Abandoned', 'Answering Machine', 'Busy Signal',
+        'Call Back-Random', 'Call Back-Scheduled', 'Dead Air - Dial Again Now',
+        'Disconnected', 'Disconnected - Dial again now', 'Dropped Call',
+        'Early Hang Up- RPC not Verified', 'Early Hang Up- Rpc Verified',
+        'Early Hang Up- RPC Not Verified- 4 Month Rest',
+        'Early hang Up- RPC not Verified- Angry Customer', 'Fax', 'No Answer',
+        'Sale', 'Transfer', 'Wrong Number'
+    ]
+};
+
+const dncDriverOptions = [
+    'Unwanted Solicitation', 'Privacy Concerns', 'Time and Convenience',
+    'Unwanted Sales Pitches (Onesource RFC)', 'Unwanted Sales Pitches (personalized RFC)',
+    'Harassment or Nuisance', 'Preference for Alternative Communication Channels',
+    'Negative Past Experiences', 'No Recording'
+];
+
+function loadDNCdata(isAutoRefresh = false) {
+    console.log('Starting DNC data load');
+    if (!isAutoRefresh) showTableLoader();
+
+    // Capture the current state of dropdowns, including their open states
+    const dropdownStates = captureDropdownStates();
+    
+    // Capture current search term
+    const searchInput = document.getElementById('searchInputDNC');
+    const currentSearchTerm = searchInput ? searchInput.value : '';
+
+    google.script.run
+        .withSuccessHandler((result) => {
+            console.log('Received DNC data:', result);
+
+            if (result.error) {
+                console.error('Error in getDNCData:', result.error);
+                renderEmptyTableDNC();
+                hideTableLoader();
+                return;
+            }
+
+            if (result && result.data && result.data.length > 0) {
+                allData = result.data;
+                uniqueIds = result.ids;
+                lastTimestamp = result.timestamp;
+                userEmail = result.userEmail;
+                document.body.dataset.currentUser = userEmail;
+
+                console.log('Sample DNC row:', allData[0]);
+                
+                // Apply search filter if there was a search term
+                if (currentSearchTerm) {
+                    handleDNCSearch();
+                } else {
+                    renderTableDNC(allData, uniqueIds);
+                }
+
+                // Reapply saved dropdown states (values and open states) after rendering the table
+                reapplyDropdownStates(dropdownStates);
+
+                // Update dropdowns with any new options from the backend
+                updateDropdownsFromSheet(allData);
+            } else {
+                console.error('No DNC data received or empty data set');
+                if (!isAutoRefresh) renderEmptyTableDNC();
+            }
+            if (!isAutoRefresh) hideTableLoader();
+        })
+        .withFailureHandler((error) => {
+            console.error('Error fetching DNC data:', error);
+            if (!isAutoRefresh) {
+                renderEmptyTableDNC();
+                hideTableLoader();
+            }
+        })
+        .getDNCData();
+}
+
+
+
+// This function will be responsible for updating the dropdowns for Category and Sub-Category
+function updateDropdownsFromSheet(data) {
+    data.forEach((row, index) => {
+        const uniqueId = uniqueIds[index];
+        const rowElement = document.querySelector(`tr[data-unique-id='${uniqueId}']`);
+
+        if (rowElement) {
+            // Reapply category dropdown based on the data
+            const categoryDropdown = rowElement.querySelector('.category-dropdown');
+            if (categoryDropdown && row[8]) {
+                const categoryValue = row[8].toLowerCase();
+                const categoryOptions = Array.from(categoryDropdown.options);
+                let matchFound = false;
+
+                categoryOptions.forEach(option => {
+                    if (option.value.toLowerCase() === categoryValue) {
+                        option.selected = true;
+                        matchFound = true;
+                    }
+                });
+
+                // If no match is found or value is empty, reset to the default value
+                if (!matchFound || !categoryValue) {
+                    categoryDropdown.value = ''; // Reset to "-- Select Category --"
+                }
+                
+                // Trigger the sub-category update after setting the category
+                const subCategoryDropdown = rowElement.querySelector('.subcategory-dropdown');
+                updateSubCategoryOptions(subCategoryDropdown, categoryDropdown.value, uniqueId);
+            } else {
+                // Reset category dropdown to default if no data
+                categoryDropdown.value = '';
+            }
+
+            // Reapply sub-category dropdown based on the data
+            const subCategoryDropdown = rowElement.querySelector('.subcategory-dropdown');
+            if (subCategoryDropdown && row[9]) {
+                const subCategoryValue = row[9].toLowerCase();
+                const subCategoryOptions = Array.from(subCategoryDropdown.options);
+                let matchFound = false;
+
+                subCategoryOptions.forEach(option => {
+                    if (option.value.toLowerCase() === subCategoryValue) {
+                        option.selected = true;
+                        matchFound = true;
+                    }
+                });
+
+                // If no match is found or value is empty, reset to the default value
+                if (!matchFound || !subCategoryValue) {
+                    subCategoryDropdown.value = ''; // Reset to "-- Select Sub-Category --"
+                }
+            } else {
+                // Reset sub-category dropdown to default if no data
+                subCategoryDropdown.value = '';
+            }
+
+            // Reapply DNC Driver dropdown based on the data
+            const dncDriverDropdown = rowElement.querySelector('.dnc-driver-dropdown');
+            if (dncDriverDropdown && row[11]) {
+                const dncDriverValue = row[11].toLowerCase();
+                const dncDriverOptions = Array.from(dncDriverDropdown.options);
+                let matchFound = false;
+
+                dncDriverOptions.forEach(option => {
+                    if (option.value.toLowerCase() === dncDriverValue) {
+                        option.selected = true;
+                        matchFound = true;
+                    }
+                });
+
+                // If no match is found or value is empty, reset to the default value
+                if (!matchFound || !dncDriverValue) {
+                    dncDriverDropdown.value = ''; // Reset to "-- Select DNC Driver --"
+                }
+            } else {
+                // Reset DNC Driver dropdown to default if no data
+                dncDriverDropdown.value = '';
+            }
+        }
+    });
+}
+
+
+function disableDropdown(dropdown) {
+    dropdown.disabled = true;
+    dropdown.classList.add('loading'); // Add visual feedback
+
+    // Re-enable dropdown automatically after 500ms if backend takes time
+    setTimeout(() => {
+        if (dropdown.classList.contains('loading')) {
+            dropdown.disabled = false;
+            dropdown.classList.remove('loading');
+        }
+    }, 500); // Adjust to a lower value for better responsiveness
+}
+
+
+
+
+function captureDropdownStates() {
+    const states = {};
+    document.querySelectorAll('tr[data-unique-id]').forEach((row) => {
+        const uniqueId = row.dataset.uniqueId;
+        const categoryDropdown = row.querySelector('.category-dropdown');
+        const subCategoryDropdown = row.querySelector('.subcategory-dropdown');
+        const dncDriverDropdown = row.querySelector('.dnc-driver-dropdown');
+        const svDropdown = row.querySelector('select');
+        const dateInput = row.querySelector('input[type="date"]');
+
+        states[uniqueId] = {
+            category: {
+                value: categoryDropdown ? categoryDropdown.value : null,
+                open: categoryDropdown && document.activeElement === categoryDropdown,
+                loading: categoryDropdown && categoryDropdown.classList.contains('loading'),
+            },
+            subCategory: {
+                value: subCategoryDropdown ? subCategoryDropdown.value : null,
+                open: subCategoryDropdown && document.activeElement === subCategoryDropdown,
+                loading: subCategoryDropdown && subCategoryDropdown.classList.contains('loading'),
+            },
+            dncDriver: {
+                value: dncDriverDropdown ? dncDriverDropdown.value : null,
+                open: dncDriverDropdown && document.activeElement === dncDriverDropdown,
+                loading: dncDriverDropdown && dncDriverDropdown.classList.contains('loading'),
+            },
+            svName: {
+                value: svDropdown ? svDropdown.value : null,
+                open: svDropdown && document.activeElement === svDropdown,
+                loading: svDropdown && svDropdown.classList.contains('loading'),
+            },
+            dateValidated: {
+                value: dateInput ? dateInput.value : null,
+                focused: dateInput && document.activeElement === dateInput,
+                loading: dateInput && dateInput.classList.contains('loading'),
+            },
+        };
+    });
+    return states;
+}
+
+
+function reapplyDropdownStates(states) {
+    document.querySelectorAll('tr[data-unique-id]').forEach((row) => {
+        const uniqueId = row.dataset.uniqueId;
+        const state = states[uniqueId];
+
+        if (state) {
+            const categoryDropdown = row.querySelector('.category-dropdown');
+            const subCategoryDropdown = row.querySelector('.subcategory-dropdown');
+            const dncDriverDropdown = row.querySelector('.dnc-driver-dropdown');
+            const svDropdown = row.querySelector('select');
+            const dateInput = row.querySelector('input[type="date"]');
+
+            // Preserve category state
+            if (categoryDropdown && state.category) {
+                if (categoryDropdown.value !== state.category.value) {
+                    categoryDropdown.value = state.category.value || '';
+                }
+                if (state.category.loading) categoryDropdown.classList.add('loading');
+                if (state.category.open) setTimeout(() => categoryDropdown.focus(), 10);
+            }
+
+            // Preserve sub-category state
+            if (subCategoryDropdown && state.subCategory) {
+                if (subCategoryDropdown.value !== state.subCategory.value) {
+                    subCategoryDropdown.value = state.subCategory.value || '';
+                }
+                if (state.subCategory.loading) subCategoryDropdown.classList.add('loading');
+                if (state.subCategory.open) setTimeout(() => subCategoryDropdown.focus(), 10);
+            }
+
+            // Preserve DNC Driver state
+            if (dncDriverDropdown && state.dncDriver) {
+                if (dncDriverDropdown.value !== state.dncDriver.value) {
+                    dncDriverDropdown.value = state.dncDriver.value || '';
+                }
+                if (state.dncDriver.loading) dncDriverDropdown.classList.add('loading');
+                if (state.dncDriver.open) setTimeout(() => dncDriverDropdown.focus(), 10);
+            }
+
+            // Preserve SV Name dropdown state
+            if (svDropdown && state.svName && !categoryDropdown) {
+                if (svDropdown.value !== state.svName.value) {
+                    svDropdown.value = state.svName.value || '';
+                }
+                if (state.svName.loading) svDropdown.classList.add('loading');
+                if (state.svName.open) setTimeout(() => svDropdown.focus(), 10);
+            }
+
+            // Preserve date input state
+            if (dateInput && state.dateValidated) {
+                if (dateInput.value !== state.dateValidated.value) {
+                    dateInput.value = state.dateValidated.value || '';
+                }
+                if (state.dateValidated.loading) dateInput.classList.add('loading');
+                if (state.dateValidated.focused) setTimeout(() => dateInput.focus(), 10);
+            }
+        }
+    });
+}
+
+
+
+
+function renderTableDNC(data, filteredIds) {
+    console.log('Starting renderTableDNC');
+    const table = document.getElementById('salesTableDNC');
+    if (!table) {
+        console.error('Table with id "salesTableDNC" not found during render');
+        return;
+    }
+    const tableBody = table.querySelector('tbody');
+    const thead = table.querySelector('thead');
+    if (!tableBody || !thead) {
+        console.error('Table body or head not found');
+        return;
+    }
+
+    // Rebuild the table header only if it is empty
+    if (!thead.innerHTML.trim()) {
+        const headerRow = document.createElement('tr');
+        const headers = [
+            'SV Name', 'Call Date', 'Status', 'xID', 'Campaign', 'BAN', 'PHONE1', 'Category', 'Sub-Category', 'Portfolio', 'DNC Driver', 'Agent Name', 'FLM Name',
+        ];
+        headers.forEach((header) => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+    }
+
+    if (!data || data.length === 0) {
+        const searchInput = document.getElementById('searchInputDNC');
+        const hasSearchTerm = searchInput && searchInput.value.trim() !== '';
+        if (hasSearchTerm) {
+            renderEmptyTableDNC();
+        } else {
+            tableBody.innerHTML = '';
+        }
+        return;
+    }
+
+    // Always clear the table body first
+    tableBody.innerHTML = '';
+
+    // Create rows and apply status color using requestAnimationFrame
+    requestAnimationFrame(() => {
+        // Iterate through the data and update or create rows
+        data.forEach((row, index) => {
+            const uniqueId = filteredIds[index];
+            let tr = tableBody.querySelector(`tr[data-unique-id="${uniqueId}"]`);
+            if (!tr) {
+                // Create a new row if it does not exist
+                tr = document.createElement('tr');
+                tr.dataset.uniqueId = uniqueId;
+                tableBody.appendChild(tr);
+            }
+
+            // Avoid resetting the row if it already matches the data
+            if (tr.dataset.rendered === JSON.stringify(row)) {
+                return; // Skip re-rendering this row
+            }
+
+            // Clear the row's content and recreate its cells
+            tr.innerHTML = ''; // Clear existing cells
+            tr.dataset.rendered = JSON.stringify(row); // Save rendered state
+
+            try {
+                const cells = createRowCells(row, uniqueId);
+                cells.forEach((cell) => tr.appendChild(cell));
+            } catch (error) {
+                console.error('Error creating table row cells:', error);
+            }
+        });
+
+        // Remove rows that no longer exist in the data
+        const currentRows = Array.from(tableBody.querySelectorAll('tr[data-unique-id]'));
+        const currentIds = currentRows.map((row) => row.dataset.uniqueId);
+        const validIds = new Set(filteredIds);
+        currentRows.forEach((row) => {
+            if (!validIds.has(row.dataset.uniqueId)) {
+                row.remove();
+            }
+        });
+
+        // Apply status colors dynamically using requestAnimationFrame
+        requestAnimationFrame(() => {
+            const statusCells = Array.from(tableBody.querySelectorAll('td:nth-child(3)')); // Assuming Status is in the 3rd column
+            statusCells.forEach((statusCell) => {
+                const status = statusCell.textContent.trim();
+                applyStatusColor(statusCell, status);
+            });
+        });
+
+        // Reapply dropdown selections after rendering the table
+        reapplyDropdownStatesAfterRender(data, filteredIds);
+    });
+}
+
+function createRowCells(row, uniqueId) {
+    const cells = [];
+    // SV Name
+    const svNameTd = document.createElement('td');
+    svNameTd.textContent = row[1] || '';
+    cells.push(svNameTd);
+
+    // Call Date, Status, xID, Campaign, BAN, PHONE1
+    [2, 3, 4, 5, 6, 7].forEach(colIndex => {
+        const td = document.createElement('td');
+        td.textContent = row[colIndex] || '';
+        cells.push(td);
+    });
+
+    // Category dropdown
+    const categoryTd = document.createElement('td');
+    categoryTd.appendChild(createCategoryDropdown(row[8], uniqueId));
+    cells.push(categoryTd);
+
+    // Sub-Category dropdown
+    const subCategoryTd = document.createElement('td');
+    subCategoryTd.appendChild(createSubCategoryDropdown(row[9], row[8], uniqueId));
+    cells.push(subCategoryTd);
+
+    // Portfolio
+    const portfolioTd = document.createElement('td');
+    portfolioTd.textContent = row[10] || '';
+    cells.push(portfolioTd);
+
+    // DNC Driver dropdown
+    const dncDriverTd = document.createElement('td');
+    dncDriverTd.appendChild(createDNCDriverDropdown(row[11], uniqueId));
+    cells.push(dncDriverTd);
+
+    // Agent Name and FLM Name
+    [12, 13].forEach(colIndex => {
+        const td = document.createElement('td');
+        td.textContent = row[colIndex] || '';
+        cells.push(td);
+    });
+
+    return cells;
+}
+
+function reapplyDropdownStatesAfterRender(data, filteredIds) {
+    data.forEach((row, index) => {
+        const uniqueId = filteredIds[index];
+        const rowElement = document.querySelector(`tr[data-unique-id='${uniqueId}']`);
+        
+        if (rowElement) {
+            // Reapply category, sub-category, and dnc driver dropdowns based on the data
+            const categoryDropdown = rowElement.querySelector('.category-dropdown');
+            const subCategoryDropdown = rowElement.querySelector('.subcategory-dropdown');
+            const dncDriverDropdown = rowElement.querySelector('.dnc-driver-dropdown');
+
+            if (categoryDropdown && row[8]) {
+                categoryDropdown.value = row[8];  // Category is in column 9 (index 8)
+            }
+            if (subCategoryDropdown && row[9]) {
+                subCategoryDropdown.value = row[9];  // Sub-Category is in column 10 (index 9)
+            }
+            if (dncDriverDropdown && row[11]) {
+                dncDriverDropdown.value = row[11];  // DNC Driver is in column 12 (index 11)
+            }
+        }
+    });
+}
+function disableDropdown(dropdown) {
+    dropdown.disabled = true;
+    dropdown.classList.add('loading'); // Add a "loading" class for visual feedback
+    setTimeout(() => {
+        dropdown.disabled = false;
+        dropdown.classList.remove('loading'); // Remove the "loading" class
+    }, 2000); // Adjust timeout as needed
+}
+
+function createCategoryDropdown(currentValue, uniqueId) {
+    const existingDropdown = document.querySelector(
+        `tr[data-unique-id='${uniqueId}'] .category-dropdown`
+    );
+
+    if (existingDropdown && existingDropdown.value === currentValue) {
+        return existingDropdown;
+    }
+
+    const select = document.createElement('select');
+    select.className = 'category-dropdown';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.text = '-- Select Category --';
+    select.appendChild(defaultOption);
+
+    categoryOptions.forEach((category) => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.text = category;
+        if (category === currentValue) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+
+    select.addEventListener('change', function () {
+        const selectedCategory = this.value;
+        const rowElement = this.closest('tr');
+        const subCategorySelect = rowElement.querySelector('.subcategory-dropdown');
+
+        this.classList.add('loading');
+        
+        if (selectedCategory === '') {
+            // Instant UI update
+            subCategorySelect.innerHTML = '';
+            const defaultSubCategoryOption = document.createElement('option');
+            defaultSubCategoryOption.value = '';
+            defaultSubCategoryOption.text = '-- Select Sub-Category --';
+            subCategorySelect.appendChild(defaultSubCategoryOption);
+            
+            // Background sync
+            google.script.run
+                .withSuccessHandler(() => this.classList.remove('loading'))
+                .withFailureHandler(() => this.classList.remove('loading'))
+                .updateDNCFields(uniqueId, { category: '', subcategory: '' });
+        } else {
+            // Instant UI update
+            updateSubCategoryOptions(subCategorySelect, selectedCategory, uniqueId);
+            
+            // Background sync
+            google.script.run
+                .withSuccessHandler(() => this.classList.remove('loading'))
+                .withFailureHandler(() => this.classList.remove('loading'))
+                .updateDNCFields(uniqueId, { category: selectedCategory });
+        }
+    });
+
+    return select;
+}
+
+
+
+
+function createSubCategoryDropdown(currentValue, category, uniqueId) {
+    const select = document.createElement('select');
+    select.className = 'subcategory-dropdown';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.text = '-- Select Sub-Category --';
+    select.appendChild(defaultOption);
+
+    if (category && subCategoryMapping[category]) {
+        subCategoryMapping[category].forEach((subCategory) => {
+            const option = document.createElement('option');
+            option.value = subCategory;
+            option.text = subCategory;
+            if (subCategory === currentValue) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    }
+
+    select.addEventListener('change', function () {
+        const selectedSubCategory = this.value;
+        
+        this.classList.add('loading');
+        
+        // Background sync
+        google.script.run
+            .withSuccessHandler(() => this.classList.remove('loading'))
+            .withFailureHandler(() => this.classList.remove('loading'))
+            .updateDNCFields(uniqueId, { subcategory: selectedSubCategory });
+    });
+
+    return select;
+}
+
+
+function createDNCDriverDropdown(currentValue, uniqueId) {
+    const select = document.createElement('select');
+    select.className = 'dnc-driver-dropdown';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.text = '-- Select DNC Driver --';
+    select.appendChild(defaultOption);
+
+    dncDriverOptions.forEach((driver) => {
+        const option = document.createElement('option');
+        option.value = driver;
+        option.text = driver;
+        if (driver === currentValue) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+
+    select.addEventListener('change', function () {
+        const selectedDriver = this.value;
+        
+        this.classList.add('loading');
+        
+        // Background sync
+        google.script.run
+            .withSuccessHandler(() => this.classList.remove('loading'))
+            .withFailureHandler(() => this.classList.remove('loading'))
+            .updateDNCFields(uniqueId, { dncDriver: selectedDriver });
+    });
+
+    return select;
+}
+
+
+
+
+// This function updates the sub-category options based on the selected category
+function updateSubCategoryOptions(subCategorySelect, selectedCategory, uniqueId) {
+    const previousValue = subCategorySelect.value; // Save the current sub-category value
+
+    subCategorySelect.innerHTML = ''; // Clear existing options
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.text = '-- Select Sub-Category --';
+    subCategorySelect.appendChild(defaultOption);
+
+    if (selectedCategory && subCategoryMapping[selectedCategory]) {
+        subCategoryMapping[selectedCategory].forEach(subCategory => {
+            const option = document.createElement('option');
+            option.value = subCategory;
+            option.text = subCategory;
+            subCategorySelect.appendChild(option);
+        });
+    } else {
+        console.log(`No sub-categories available for category: ${selectedCategory}`);
+    }
+
+    // If the category is reset, also reset the sub-category to default
+    if (!selectedCategory || !subCategorySelect.querySelector(`option[value="${previousValue}"]`)) {
+        subCategorySelect.value = '';  // Default back to "Select Sub-Category" if invalid or category is empty
+    } else {
+        // Re-apply the previous value if it's still a valid sub-category for the new category
+        subCategorySelect.value = previousValue;
+    }
+}
+
+function handleCategoryChange(event, uniqueId) {
+    const categorySelect = event.target;
+    const selectedCategory = categorySelect.value;
+    console.log(`Category selected: ${selectedCategory}`);
+
+    const rowElement = categorySelect.closest('tr');
+    const subCategorySelect = rowElement.querySelector('.subcategory-dropdown');
+
+    // Check if the category is reset (i.e., default option selected)
+    if (selectedCategory === '') {
+        // Reset the sub-category value in the UI
+        subCategorySelect.value = '';  // Reset sub-category in the UI
+
+        // Reset category and sub-category in Google Sheets
+        google.script.run
+            .updateDNCField(uniqueId, 'category', '')  // Reset category in Google Sheets
+            .updateDNCField(uniqueId, 'subcategory', '');  // Reset sub-category in Google Sheets
+    } else {
+        // Update category field in Google Sheets
+        google.script.run.updateDNCField(uniqueId, 'category', selectedCategory);
+
+        // Update sub-category options based on the selected category
+        updateSubCategoryOptions(subCategorySelect, selectedCategory, uniqueId);
+    }
+}
+
+
+
+
+function handleSubCategoryChange(event, uniqueId) {
+    const subCategorySelect = event.target;
+    const selectedSubCategory = subCategorySelect.value;
+    console.log(`Sub-Category selected: ${selectedSubCategory}`);
+
+    // Update the sub-category field in the Google Sheet
+    google.script.run.updateDNCField(uniqueId, 'subcategory', selectedSubCategory);
+}
+
+
+
+function updateDNCField(uniqueId, field, value) {
+    console.log(`Updating DNC field - ID: ${uniqueId}, Field: ${field}, Value: ${value}`);
+
+    const dropdown = document.querySelector(`tr[data-unique-id="${uniqueId}"] select.${field}-dropdown`);
+    if (dropdown) dropdown.disabled = true; // Temporarily disable the dropdown
+
+    google.script.run
+        .withSuccessHandler(() => {
+            console.log(`Successfully updated ${field} for ID: ${uniqueId}`);
+            if (dropdown) setTimeout(() => (dropdown.disabled = false), 500); // Re-enable dropdown shortly
+        })
+        .withFailureHandler((error) => {
+            console.error(`Error updating ${field} for ID: ${uniqueId}:`, error);
+            if (dropdown) dropdown.disabled = false; // Re-enable dropdown on failure
+        })
+        .updateDNCField(uniqueId, field, value);
+}
+
+
+
+function renderEmptyTableDNC() {
+    const table = document.getElementById('salesTableDNC');
+    if (!table) {
+        console.error('DNC table not found when rendering empty state');
+        return;
+    }
+
+    const tableBody = table.querySelector('tbody');
+    if (tableBody) {
+        tableBody.innerHTML = '<tr><td colspan="13" style="text-align: center;">No Data Available</td></tr>';
+    } else {
+        console.error('Table body not found when rendering empty state');
+    }
+}
+
+function startPolling() {
+    stopPolling();
+
+    console.log(`✅ Polling started for: ${page}`);
+
+    pollingInterval = setInterval(() => {
+        // Skip refresh if user is actively interacting with dropdowns
+        if (document.activeElement && (document.activeElement.tagName === 'SELECT' || document.activeElement.classList.contains('loading'))) {
+            console.log('⏸️ Skipping refresh - user interacting with dropdown');
+            return;
+        }
+
+        console.log(`🔄 Refreshing data for: ${page}`);
+
+        if (page === 'sales-dump-wls') {
+            loadSalesDataWLS(true);
+        } else if (page === 'sales-dump-ffh') {
+            loadSalesDataFFH(true);
+        } else if (page === 'dnc') {
+            loadDNCdata(true);
+        } else {
+            stopPolling();
+        }
+    }, 60000); // Increased to 60 seconds to reduce quota usage
+}
+function stopPolling() {
+    if (pollingInterval) {
+        console.log("🛑 Stopping polling...");
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+    }
+}
+
+
+
+
+///////////////////////////////////////////////////////////WLS MODAL FORM//////////////////////////////////////////////////////////////////////
+// Define sectionMapping globally for both form submission and showSummary to use
+const sectionMapping = {
+    "Regulatory": [
+        "Identify right party contact", "Provided agent name", "Calling from TELUS", "DNC Process", 
+        "Correct release code", "Ask existing customer for phone number prior to transferring"
+    ],
+    "Privacy": [
+        "Recording statement", "Recording statement after discovery", "Do not provide XID",
+        "Do not provide Last Name", "Do not provide manager last name", "Authenticate account properly", 
+        "Authenticate account"
+    ],
+    "Price Information": [
+        "Monthly rate plan cost", "Easy payment", "Upfront taxes", "Partial month billing", 
+        "Set regular/promotional price expectations", "Connection fees"
+    ],
+    "Plan Information": [
+        "Plan name", "Product features", "Equipment/device information", "Service term or length", 
+        "Data and long distance allotment", "Gift with purchase"
+    ],
+    "Order Processing": [
+        "Billing and shipping address should match", "Do not provision an expired plan/offer", 
+        "Select the right device", "Select the right plan/products", "Place an order", 
+        "Confirm the customer's full name", "Capture their best contact number/email address", 
+        "Provide customer BAN", "Do not sell 3 or more devices"
+    ],
+    "Account Documentation": [
+        "No notes", "Incomplete notes", "Inaccurate notes"
+    ],
+    "Call Summary": [
+        "Billing recap", "Tablet Activation", "Term and cancellation", "SIM activation and billing", 
+        "Wireless Home Phone Activation", "Extended Warranty", "TELUS Online Security", "Stream+"
+    ],
+    "Business Intelligence": [
+        "Failed to Cross-sell"
+    ],
+    "Marketing Objectives": [
+        "Account Linking", "Email Capture", "Survey Promotion"
+    ],
+    "Professionalism": [
+        "Agent did not follow credit check guidelines", "Agent did not act as an extension of TELUS", 
+        "Transferring calls to the IVR without informing the customer", "Agent sold product or service under false pretenses", 
+        "Excessive hold or dead air", "Sharing personal information (DL#, SIN, Passport#)", "ZTP - Use of Profanity", 
+        "ZTP - Unethical VOC Practices", "ZTP - Misuse of customer's credit information", "ZTP - Failure to authenticate", 
+        "ZTP - Proactively re-rate", "ZTP - Misleading or purposefully giving inaccurate information", 
+        "ZTP - Slam sales/Selling to vulnerable customers", "ZTP - Manipulating sales information/established processes", 
+        "ZTP - Selling based on installation/cancellation"
+    ]
+};
+
+// Attach event listeners for WLS-specific functionality
+function attachWLSListeners() {
+    // Add search handler
+    const searchInput = document.getElementById('searchInputWLS');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            performSearch(searchTerm, 'WLS');
+        });
+    }
+
+    const toggleButton = document.getElementById('dataSourceToggleWLS'); // Match the button's actual ID
+    if (toggleButton) {
+        // Update the button text on page load
+        updateToggleButtonTextWLS();
+
+        // Add click event to toggle the data source
+        toggleButton.addEventListener('click', () => {
+            toggleDataSourceWLS();
+        });
+    } else {
+        console.error('Toggle button for WLS not found.');
+    }
+
+    // Attach event listeners to filter buttons for WLS
+    document.querySelectorAll('.filter-buttons-WLS button').forEach((button) => {
+        if (!button.id.includes('dataSourceToggle')) {
+            button.addEventListener('click', () => {
+                const category = button.getAttribute('data-category');
+                document.querySelectorAll('.filter-buttons-WLS button').forEach((btn) =>
+                    btn.classList.remove('active')
+                );
+                button.classList.add('active');
+                filterDataWLS(category);
+            });
+        }
+    });
+}
+function updateToggleButtonTextWLS() {
+    const toggleButton = document.getElementById('dataSourceToggleWLS'); // Match the button's actual ID
+    if (!toggleButton) {
+        console.error('Toggle button for WLS not found.');
+        return;
+    }
+
+    // Update the button text based on the current data source
+    toggleButton.textContent = currentDataSourceWLS === 'current' ? 'Backlogs' : 'Current';
+}
+
+
+/// Update openFormWLS function
+function openFormWLS(rowData) {
+    const modal = document.getElementById('formModalWLS');
+    if (!modal) {
+        console.error('Modal element not found');
+        return;
+    }
+    modal.style.display = 'flex';
+    showEvalFormLoader();
+
+    const uniqueId = rowData[6];
+
+    // Reset the form and clear any existing data
+    resetFormWLS(modal);
+
+    // Fetch new data for this specific uniqueId
+    google.script.run.withSuccessHandler(function(realtimeData) {
+        populateFormWLS(realtimeData, rowData, modal, uniqueId);
+        hideEvalFormLoader();
+    }).getRealtimeDataFromSheet(uniqueId, 'WLS');
+}
+
+function resetFormWLS(modal) {
+    const evalForm = modal.querySelector('#evalFormWLS');
+    if (evalForm) {
+        evalForm.reset();
+    }
+
+    // Clear any existing summary
+    const existingSummary = modal.querySelector('#summaryContent');
+    if (existingSummary) {
+        existingSummary.remove();
+    }
+
+    // Reset visibility of form sections
+    const formSections = modal.querySelectorAll('#page1, #page2, #page3, #remarksSection, #zviqRemarks');
+    formSections.forEach(section => section.style.display = 'none');
+    
+    // Show the first page
+    const page1 = modal.querySelector('#page1');
+    if (page1) page1.style.display = 'block';
+
+    // Show submit and clear buttons
+    const submitButton = modal.querySelector('.submitWLS');
+    const clearButton = modal.querySelector('.clearWLS');
+    if (submitButton) submitButton.style.display = 'inline';
+    if (clearButton) clearButton.style.display = 'inline';
+
+    // Clear all checkboxes
+    modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    // Clear all text inputs and textareas
+    modal.querySelectorAll('input[type="text"], textarea').forEach(input => {
+        input.value = '';
+    });
+
+    // Reset call disposition
+    const callDisposition = modal.querySelector('#callDisposition');
+    if (callDisposition) {
+        callDisposition.value = '';
+    }
+}
+
+function populateFormWLS(existingData, rowData, modal, uniqueId) {
+    console.log('Existing Data:', existingData);
+    console.log('Row Data:', rowData);
+    const elements = {
+        dateValidated: modal.querySelector('#dateValidatedWLS'),
+        saleDate: modal.querySelector('#saleDateWLS'),
+        xID: modal.querySelector('#xIDWLS'),
+        agentName: modal.querySelector('#agentName'),
+        ban: modal.querySelector('#banWLS'),
+        phoneNumber: modal.querySelector('#phoneNumberWLS'),
+        soldBAN: modal.querySelector('#soldBANWLS'),
+        soldPhone: modal.querySelector('#soldPhoneWLS'),
+        cssPortfolio: modal.querySelector('#cssPortfolioWLS'),
+        productID: modal.querySelector('#productIDWLS'),
+        orderID: modal.querySelector('#orderIDWLS'),
+        dueDate: modal.querySelector('#dueDateWLS'),
+        multipleSales: modal.querySelector('#multipleSalesWLS'),
+        numberOfSales: modal.querySelector('#numberOfSalesWLS'),
+        svName: modal.querySelector('#svNameWLS')
+    };
+
+    // Populate form fields with rowData
+    Object.entries(elements).forEach(([key, element]) => {
+        if (element) {
+            element.textContent = rowData[getRowDataIndex(key)];
+        }
+    });
+
+    const callDisposition = modal.querySelector('#callDisposition');
+    const remarksSection = modal.querySelector('#remarksSection');
+    const remarksLabel = modal.querySelector('#remarksLabel');
+    const zviqRemarks = modal.querySelector('#zviqRemarks');
+    const flagsSection = modal.querySelector('#page2');
+    const professionalismSection = modal.querySelector('#page3');
+    const submitButton = modal.querySelector('.submitWLS');
+    const clearButton = modal.querySelector('.clearWLS');
+    const evalForm = modal.querySelector('#evalFormWLS');
+
+    // Initially hide the buttons
+    submitButton.style.display = 'none';
+    clearButton.style.display = 'none';
+
+    // Function to update form visibility based on disposition
+    function updateFormVisibility(disposition) {
+        remarksSection.style.display = 'none';
+        zviqRemarks.style.display = 'none';
+        flagsSection.style.display = 'none';
+        professionalismSection.style.display = 'none';
+
+        if (disposition.startsWith('Good Sale')) {
+            remarksSection.style.display = 'block';
+        } else if (disposition.includes('Fall-out') || disposition.includes('Error Correction')) {
+            if (disposition === 'Fall-out Potential - Professionalism Issue') {
+                flagsSection.style.display = 'block';
+                professionalismSection.style.display = 'block';
+                zviqRemarks.style.display = 'block';
+            } else {
+                flagsSection.style.display = 'block';
+                zviqRemarks.style.display = 'block';
+            }
+        }
+    }
+
+    // Populate form with existing data if available
+    if (existingData) {
+        callDisposition.value = existingData.callDisposition || '';
+        modal.querySelector('#zviqEvalID').value = existingData.zviqEvalID || '';
+        
+        console.log('Good Sale Remarks:', existingData.goodSaleRemarks);
+        console.log('PROF/FLAG Remarks:', existingData.profFlagRemarks);
+        
+        modal.querySelector('#goodSaleRemarks').value = existingData.goodSaleRemarks || '';
+        modal.querySelector('#flagRemarks').value = existingData.profFlagRemarks || '';
+
+        // Set checkboxes based on existingData (including professionalism)
+        if (existingData.selectedFlags) {
+            for (let category in existingData.selectedFlags) {
+                existingData.selectedFlags[category].forEach(flag => {
+                    const checkbox = modal.querySelector(`input[name="flags"][value="${flag}"], input[name="professionalism"][value="${flag}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+        }
+
+        // Update form visibility based on existing call disposition
+        updateFormVisibility(existingData.callDisposition);
+
+        // Show buttons if there's existing data
+        if (existingData.callDisposition && existingData.callDisposition !== '--Select Disposition--') {
+            submitButton.style.display = 'inline';
+            clearButton.style.display = 'inline';
+        }
+    } else {
+        // If no existing data, reset the form
+        evalForm.reset();
+        updateFormVisibility('');
+    }
+
+    // Event listener for Call Disposition changes
+callDisposition.addEventListener('change', function () {
+    const disposition = this.value ? this.value.toString() : '';
+    
+    // Clear all checkboxes when disposition changes
+    modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // Clear remarks fields
+    modal.querySelector('#goodSaleRemarks').value = '';
+    modal.querySelector('#flagRemarks').value = '';
+    
+    updateFormVisibility(disposition);
+
+    // Remove 'required' attribute from ZVIQ Eval ID by default
+    const zviqEvalIDInput = modal.querySelector('#zviqEvalID');
+    if (zviqEvalIDInput) {
+        zviqEvalIDInput.removeAttribute('required');
+        zviqEvalIDInput.value = ''; // Clear ZVIQ Eval ID field
+    }
+
+    // Show/hide buttons and fields based on disposition choice
+    if (disposition === '' || disposition === '--Select Disposition--') {
+        submitButton.style.display = 'none';
+        clearButton.style.display = 'none';
+    } else {
+        submitButton.style.display = 'inline';
+        clearButton.style.display = 'inline';
+
+        if (disposition.indexOf('Good Sale') === 0) {
+            remarksLabel.textContent = `Remarks: Why is it a ${disposition}?`;
+        } else if (disposition.indexOf('Fall-out') !== -1 || disposition.indexOf('Error Correction') !== -1) {
+            if (zviqEvalIDInput) zviqEvalIDInput.setAttribute('required', 'required');
+        }
+    }
+});
+
+    // Form submission logic
+evalForm.onsubmit = function(event) {
+    event.preventDefault();
+    showEvalFormLoader();
+    const formData = collectFormData(modal, elements, callDisposition);
+    console.log('Form Data being submitted:', formData);
+    formData.uniqueId = uniqueId;
+    
+    // Save form data
+    google.script.run
+        .withSuccessHandler(function() {
+            showSummary(formData, modal, updateFormVisibility);
+            lastTimestamp = 0;
+            startPolling();
+            hideEvalFormLoader();
+        })
+        .withFailureHandler(function(error) {
+            console.error('Error saving form data:', error);
+            alert('An error occurred while saving the form. Please try again.');
+            hideEvalFormLoader();
+        })
+        .saveFormData('WLS', uniqueId, formData);
+
+    // Update Eval Form Submission
+    google.script.run
+        .withSuccessHandler(function() {
+            console.log('Eval form submission updated successfully');
+            lastTimestamp = 0;
+            startPolling();
+        })
+        .withFailureHandler(function(error) {
+            console.error('Error updating eval form submission:', error);
+            alert('An error occurred while updating the evaluation. Please try again.');
+        })
+        .updateEvalFormSubmissionWLS(formData);
+};
+
+// Clear button logic
+clearButton.onclick = function() {
+    showEvalFormLoader();
+    
+    // Clear data in Google Sheet
+    google.script.run
+        .withSuccessHandler(function(response) {
+            console.log(response);
+            hideEvalFormLoader();
+            
+            // Reset form fields
+            callDisposition.value = '';
+            modal.querySelector('#zviqEvalID').value = '';
+            modal.querySelector('#goodSaleRemarks').value = '';
+            modal.querySelector('#flagRemarks').value = '';
+            updateFormVisibility('');
+            
+            submitButton.style.display = 'none';
+            clearButton.style.display = 'none';
+            
+            modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            lastTimestamp = 0;
+            startPolling();
+        })
+        .withFailureHandler(function(error) {
+            hideEvalFormLoader();
+            console.error('Error clearing form:', error);
+            alert('Failed to clear form. Please try again.');
+        })
+        .clearEvalFormData(uniqueId);
+
+    // Clear saved form data
+    google.script.run
+        .withFailureHandler(function(error) {
+            console.error('Error clearing saved form data:', error);
+        })
+        .saveFormData('WLS', uniqueId, {});
+};
+
+    // Modify the close button logic
+    const closeButtons = modal.querySelectorAll('.close, .close-summary');
+    closeButtons.forEach(button => {
+        button.onclick = function() {
+            resetFormWLS(modal);
+            modal.style.display = 'none';
+        };
+    });
+
+    // Select existing close buttons
+    const closeIcon = modal.querySelectorAll('.close, .closeModal');
+    closeIcon.forEach(icon => {
+      icon.onclick = function() {
+        resetFormWLS(modal);
+        modal.style.display = 'none';
+    };
+});
+    
+}
+
+function collectFormData(modal, elements, callDisposition) {
+    const selectedFlags = {
+        "Regulatory": [],
+        "Privacy": [],
+        "Price Information": [],
+        "Plan Information": [],
+        "Order Processing": [],
+        "Account Documentation": [],
+        "Call Summary": [],
+        "Business Intelligence": [],
+        "Marketing Objectives": [],
+        "Professionalism": []
+    };
+
+    // Collect selected flags
+    modal.querySelectorAll('input[name="flags"]:checked').forEach(flag => {
+        for (let section in sectionMapping) {
+            if (sectionMapping[section].includes(flag.value)) {
+                selectedFlags[section].push(flag.value);
+            }
+        }
+    });
+
+    // Collect professionalism flags separately
+    modal.querySelectorAll('input[name="professionalism"]:checked').forEach(flag => {
+        selectedFlags["Professionalism"].push(flag.value);
+    });
+
+    return {
+        svName: elements.svName.textContent,
+        dateValidated: elements.dateValidated.textContent,
+        saleDate: elements.saleDate.textContent,
+        xID: elements.xID.textContent,
+        agentName: elements.agentName.textContent,
+        ban: elements.ban.textContent,
+        phoneNumber: elements.phoneNumber.textContent,
+        soldBAN: elements.soldBAN.textContent,
+        soldPhone: elements.soldPhone.textContent,
+        cssPortfolio: elements.cssPortfolio.textContent,
+        productID: elements.productID.textContent,
+        orderID: elements.orderID.textContent,
+        dueDate: elements.dueDate.textContent,
+        multipleSales: elements.multipleSales.textContent,
+        numberOfSales: elements.numberOfSales.textContent,
+        callDisposition: callDisposition.value,
+        zviqEvalID: modal.querySelector('#zviqEvalID') ? modal.querySelector('#zviqEvalID').value : '',
+        selectedFlags: selectedFlags,
+        profFlagRemarks: (!callDisposition.value.startsWith('Good Sale')) ? modal.querySelector('#flagRemarks').value : '',
+        goodSaleRemarks: (callDisposition.value.startsWith('Good Sale')) ? modal.querySelector('#goodSaleRemarks').value : ''
+    };
+}
+
+function showSummary(formData, modal, updateFormVisibility) {
+    // Remove any existing summary
+    const existingSummary = modal.querySelector('#summaryContent');
+    if (existingSummary) {
+        existingSummary.remove();
+    }
+
+    const summaryContent = document.createElement('div');
+    summaryContent.id = 'summaryContent';
+    
+    let summaryHTML = `<h3>Evaluation Summary</h3>`;
+
+    summaryHTML += `<strong>Eval ID:</strong> ${formData.zviqEvalID || 'N/A'}<br>`;
+    summaryHTML += `<strong>Call Disposition:</strong> ${formData.callDisposition || 'N/A'}<br><br>`;
+
+    // Add flags and professionalism issues
+    for (const [section, flags] of Object.entries(formData.selectedFlags)) {
+          if (flags.length > 0 && section !== "Professionalism") {
+        summaryHTML += `<strong>${section}:</strong><br>`;
+        flags.forEach(flag => {
+            summaryHTML += `${flag}<br>`;
+        });
+        summaryHTML += `<br>`;
+    }
+}
+
+// Add professionalism flags separately
+if (formData.selectedFlags["Professionalism"].length > 0) {
+    summaryHTML += `<strong>Professionalism:</strong><br>`;
+    formData.selectedFlags["Professionalism"].forEach(flag => {
+        summaryHTML += `${flag}<br>`;
+    });
+    summaryHTML += `<br>`;
+}
+
+summaryHTML += `SV Comment:<br><br>`;
+
+// Add remarks
+if (formData.goodSaleRemarks && formData.goodSaleRemarks.trim() !== '') {
+    summaryHTML += `<strong>Good Sale Remarks:</strong><br>${formData.goodSaleRemarks}<br><br>`;
+} else if (formData.profFlagRemarks && formData.profFlagRemarks.trim() !== '') {
+    summaryHTML += `<strong>PROF/FLAG Remarks:</strong><br>${formData.profFlagRemarks}<br><br>`;
+}
+
+// Set the summary content
+summaryContent.innerHTML = summaryHTML;
+
+// Hide the questionnaire sections
+const page1 = modal.querySelector('#page1');
+const page2 = modal.querySelector('#page2');
+const page3 = modal.querySelector('#page3');
+if (page1) page1.style.display = 'none';
+if (page2) page2.style.display = 'none';
+if (page3) page3.style.display = 'none';
+
+// Hide the submit and clear buttons
+const submitButton = modal.querySelector('.submitWLS');
+const clearButton = modal.querySelector('.clearWLS');
+if (submitButton) submitButton.style.display = 'none';
+if (clearButton) clearButton.style.display = 'none';
+
+// Find the location to insert the summary (after the pre-filled information)
+const infoSection = modal.querySelector('.info-section');
+if (infoSection && infoSection.nextSibling) {
+    infoSection.parentNode.insertBefore(summaryContent, infoSection.nextSibling);
+} else {
+    console.error('Could not find appropriate location to insert summary');
+}
+
+// Create a container for the buttons
+const buttonContainer = document.createElement('div');
+buttonContainer.style.marginTop = '20px';
+
+const backButton = document.createElement('button');
+backButton.textContent = 'Back to Eval form';
+backButton.className = 'back-summary';
+backButton.onclick = function() {
+    summaryContent.remove();
+    if (page1) page1.style.display = 'block';
+    if (page2) page2.style.display = 'block';
+    if (page3) page3.style.display = 'block';
+    if (submitButton) submitButton.style.display = 'inline';
+    if (clearButton) clearButton.style.display = 'inline';
+    
+    // Show the correct sections based on the call disposition
+    updateFormVisibility(formData.callDisposition);
+};
+buttonContainer.appendChild(backButton);
+
+// Add a "Close" button
+const closeButton = document.createElement('button');
+closeButton.textContent = 'Close';
+closeButton.className = 'close-summary';
+closeButton.onclick = function() {
+    resetFormWLS(modal);
+    modal.style.display = 'none';
+};
+buttonContainer.appendChild(closeButton);
+
+// Create an "X" icon close button
+const closeIcon = document.createElement('span');
+closeIcon.className = 'closeModal';
+closeIcon.innerHTML = '&times;'; // HTML entity for "×"
+closeIcon.onclick = function() {
+    resetFormWLS(modal);
+    modal.style.display = 'none';
+};
+buttonContainer.appendChild(closeIcon);
+
+// Add the button container to the summary content
+summaryContent.appendChild(buttonContainer);
+}
+
+// Helper function to get the correct index from rowData
+function getRowDataIndex(key) {
+const indexMap = {
+    dateValidated: 2,
+    saleDate: 3,
+    xID: 4,
+    agentName: 15,
+    ban: 5,
+    phoneNumber: 6,
+    soldBAN: 7,
+    soldPhone: 8,
+    cssPortfolio: 9,
+    productID: 10,
+    orderID: 11,
+    dueDate: 12,
+    multipleSales: 13,
+    numberOfSales: 14,
+    svName: 1
+};
+return indexMap[key] || 0;
+}
+
+// End of WLS Modal Form code
+
+
+
+//////////////////////////////////////////////////////////////////////////Modal For FFH//////////////////////////////////////////////
+// Define sectionMapping globally for FFH
+const sectionMappingFFH = {
+    "Regulatory": [
+        "Identify right party", "Provided agent name", "Calling from TELUS", "DNC process", 
+        "Correct release code", "Correct reason for calling", "Disclaimer not actioned"
+    ],
+    "Privacy": [
+        "Recording statement", "Recording statement after discovery", "Do not provide XID",
+        "Do not provide Last Name", "Do not provide manager last name", "Authenticate account properly", 
+        "Authenticate account"
+    ],
+    "Price Information": [
+        "Monthly rate plan cost", "Easy payment", "Upfront taxes", 
+        "Set regular/promotional price expectations", "Installation/Delivery Fee", 
+        "Cancellation fees", "Partial month billing", "Credit claw back",
+        "Usage charges"
+    ],
+    "Plan Information": [
+        "Plan name", "Product features", "Equipment/device information", 
+        "Service term or length", "Data and long distance allotment", "Gift with purchase"
+    ],
+    "Order Processing": [
+        "Service terms", "Billing and shipping address should match", 
+        "Order not processed correctly", "Select the right plan/products", 
+        "Invalid offer provided", "Place an order", "Confirm the customer's full name",
+        "Provide customer BAN", "Installation details", "Device shipment expectations",
+        "Simple switch/winback", "Product activation"
+    ],
+    "Account Documentation": [
+        "No notes", "Incomplete notes", "Inaccurate notes", "Notes left on wrong account"
+    ],
+    "Call Summary": [
+        "Summarize the solution", "SHS App download", "30 day satisfaction guarantee"
+    ],
+    "Customer Experience": [
+        "Engage (Incomplete,Incorrect RFC)", "Understand/Diagnose Pain", "Solve/Claim",
+        "Check for understanding", "Concern handling", "Hold time and dead air",
+        "Check for satisfaction"
+    ],
+    "Business Intelligence": [
+        "Objection Handling", "CBR Capture"
+    ],
+    "Marketing Objectives": [
+        "Account Linking", "Email Capture", "Survey Promotion"
+    ],
+    "Professionalism": [
+        "Agent sold to a vulnerable customer", "Agent did not follow credit check guidelines",
+        "Agent did not act as an extension of TELUS", "Transferring calls to the IVR without informing the customer",
+        "Agent sold product or service under false pretences", 
+        "Agent proactively recommended downgrading", "Excessive hold or dead air",
+        "Selling based on installation", "Sharing personal information"
+    ]
+};
+
+// Global search function for both FFH and WLS
+function performSearch(searchTerm, tableType) {
+    if (!allData || allData.length === 0) return;
+    
+    const activeFilter = tableType === 'FFH' ? activeFFHFilter : activeWLSFilter;
+    
+    let filteredData = [];
+    let filteredIds = [];
+    
+    allData.forEach((row, index) => {
+        const uniqueId = uniqueIds[index];
+        
+        // Apply category filter first
+        let passesFilter = true;
+        if (tableType === 'FFH') {
+            const ffhCategories = ['TTV ACQUISITION', 'LOCAL', 'SECURITY WEST'];
+            if (activeFilter !== 'ALL') {
+                const normalizedCategory = activeFilter === 'TTV_ACQUISITION' ? 'TTV ACQUISITION' : activeFilter;
+                const rowCategory = row[9] ? row[9].trim().toUpperCase() : '';
+                passesFilter = rowCategory === normalizedCategory.toUpperCase();
+            } else {
+                passesFilter = ffhCategories.some(cat => {
+                    const rowCategory = row[9] ? row[9].trim().toUpperCase() : '';
+                    return rowCategory === cat.toUpperCase() || (rowCategory === 'TTV_ACQUISITION' && cat === 'TTV ACQUISITION');
+                });
+            }
+        } else {
+            const wlsCategories = ['KOODO_ADD_A_LINE', 'KOODO_UPSELL', 'WIRELESS_ACQUISITION', 'WIRELESS_RENEWAL'];
+            if (activeFilter !== 'ALL') {
+                passesFilter = row[9] === activeFilter;
+            } else {
+                passesFilter = wlsCategories.includes(row[9]);
+            }
+        }
+        
+        if (!passesFilter) return;
+        
+        // Apply search filter
+        if (searchTerm) {
+            const searchableText = [
+                row[15] || '', // Agent Name
+                row[4] || '',  // xID
+                row[5] || '',  // BAN
+                row[6] || '',  // Phone Number
+                row[7] || '',  // Sold BAN
+                row[8] || ''   // Sold Phone
+            ].join(' ').toLowerCase();
+            
+            if (searchableText.includes(searchTerm)) {
+                filteredData.push(row);
+                filteredIds.push(uniqueId);
+            }
+        } else {
+            filteredData.push(row);
+            filteredIds.push(uniqueId);
+        }
+    });
+    
+    if (tableType === 'FFH') {
+        renderTableFFH(filteredData, filteredIds);
+    } else {
+        renderTableWLS(filteredData, filteredIds);
+    }
+}
+
+// Handle DNC search input
+function handleDNCSearch() {
+    const searchTerm = document.getElementById('searchInputDNC').value.toLowerCase();
+    
+    if (!allData || allData.length === 0) return;
+    
+    let filteredData = allData;
+    let filteredIds = uniqueIds;
+    
+    if (searchTerm) {
+        filteredData = [];
+        filteredIds = [];
+        
+        allData.forEach((row, index) => {
+            const searchableText = [
+                row[12] || '', // Agent Name
+                row[4] || '',  // xID
+                row[6] || '',  // BAN
+                row[7] || ''   // PHONE1
+            ].join(' ').toLowerCase();
+            
+            if (searchableText.includes(searchTerm)) {
+                filteredData.push(row);
+                filteredIds.push(uniqueIds[index]);
+            }
+        });
+    }
+    
+    renderTableDNC(filteredData, filteredIds);
+}
+
+// Attach event listeners for FFH-specific functionality
+function attachFFHListeners() {
+    // Add search handler
+    const searchInput = document.getElementById('searchInputFFH');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            performSearch(searchTerm, 'FFH');
+        });
+    }
+
+    // Handle modal close buttons
+    document.querySelectorAll('.close').forEach((button) => {
+        button.addEventListener('click', () => {
+            const modal = document.getElementById('formModalFFH');
+            if (modal) {
+                resetFormFFH(modal);
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    // Close modal when clicking outside of it
+    window.onclick = function (event) {
+        const modal = document.getElementById('formModalFFH');
+        if (modal && event.target === modal) {
+            resetFormFFH(modal);
+            modal.style.display = 'none';
+        }
+    };
+
+    // Attach event listener to toggle data source button
+    const toggleButton = document.getElementById('dataSourceToggleFFH');
+    if (toggleButton) {
+        // Ensure the button text is updated on page load
+        updateToggleButtonTextFFH();
+
+        // Add click event to toggle data source
+        toggleButton.addEventListener('click', toggleDataSourceFFH);
+    }
+
+    // Attach event listeners to filter buttons for FFH
+    document.querySelectorAll('.filter-buttons-FFH button').forEach((button) => {
+        if (!button.id.includes('dataSourceToggle')) {
+            button.addEventListener('click', () => {
+                const category = button.getAttribute('data-category');
+                document.querySelectorAll('.filter-buttons-FFH button').forEach((btn) =>
+                    btn.classList.remove('active')
+                );
+                button.classList.add('active');
+                filterDataFFH(category);
+            });
+        }
+    });
+}
+
+
+// Function to toggle between "current" and "backlog" data sources
+function toggleDataSourceFFH() {
+    // Toggle the current data source
+    currentDataSourceFFH = currentDataSourceFFH === 'current' ? 'backlog' : 'current';
+
+    // Reload the data
+    loadSalesDataFFH();
+
+    // Update the button text
+    updateToggleButtonTextFFH();
+}
+
+
+// Update openFormFFH function
+function openFormFFH(rowData) {
+    const modal = document.getElementById('formModalFFH');
+    if (!modal) {
+        console.error('Modal element not found');
+        return;
+    }
+    modal.style.display = 'flex';
+    showEvalFormLoader();
+
+    const uniqueId = rowData[6];
+
+    // Reset the form and clear any existing data
+    resetFormFFH(modal);
+
+    // Fetch new data for this specific uniqueId
+    google.script.run.withSuccessHandler(function(realtimeData) {
+        populateFormFFH(realtimeData, rowData, modal, uniqueId);
+        hideEvalFormLoader();
+    }).getRealtimeDataFromSheet(uniqueId, 'FFH');
+}
+
+function resetFormFFH(modal) {
+    const evalForm = modal.querySelector('#evalFormFFH');
+    if (evalForm) {
+        evalForm.reset();
+    }
+
+    // Clear any existing summary
+    const existingSummary = modal.querySelector('#summaryContent');
+    if (existingSummary) {
+        existingSummary.remove();
+    }
+
+    // Reset visibility of form sections
+    const formSections = modal.querySelectorAll('#page1, #page2, #page3, #remarksSection, #zviqRemarks');
+    formSections.forEach(section => section.style.display = 'none');
+    
+    // Show the first page
+    const page1 = modal.querySelector('#page1');
+    if (page1) page1.style.display = 'block';
+
+    // Show submit and clear buttons
+    const submitButton = modal.querySelector('.submitFFH');
+    const clearButton = modal.querySelector('.clearFFH');
+    if (submitButton) submitButton.style.display = 'inline';
+    if (clearButton) clearButton.style.display = 'inline';
+
+    // Clear all checkboxes
+    modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    // Clear all text inputs and textareas
+    modal.querySelectorAll('input[type="text"], textarea').forEach(input => {
+        input.value = '';
+    });
+
+    // Reset call disposition
+    const callDisposition = modal.querySelector('#callDisposition');
+    if (callDisposition) {
+        callDisposition.value = '';
+    }
+}
+
+function populateFormFFH(existingData, rowData, modal, uniqueId) {
+    console.log('Existing Data:', existingData);
+    console.log('Row Data:', rowData);
+    
+    // Check for existing data from global evalData if realtime data is not available
+    if (!existingData && allData.evalData && allData.evalData.FFH && allData.evalData.FFH[uniqueId]) {
+        existingData = allData.evalData.FFH[uniqueId];
+        console.log('Found existing data in global evalData:', existingData);
+    }
+    
+    const elements = {
+        dateValidated: modal.querySelector('#dateValidatedFFH'),
+        saleDate: modal.querySelector('#saleDateFFH'),
+        xID: modal.querySelector('#xIDFFH'),
+        agentName: modal.querySelector('#agentNameFFH'),
+        ban: modal.querySelector('#banFFH'),
+        phoneNumber: modal.querySelector('#phoneNumberFFH'),
+        soldBAN: modal.querySelector('#soldBANFFH'),
+        soldPhone: modal.querySelector('#soldPhoneFFH'),
+        cssPortfolio: modal.querySelector('#cssPortfolioFFH'),
+        productID: modal.querySelector('#productIDFFH'),
+        orderID: modal.querySelector('#orderIDFFH'),
+        dueDate: modal.querySelector('#dueDateFFH'),
+        multipleSales: modal.querySelector('#multipleSalesFFH'),
+        numberOfSales: modal.querySelector('#numberOfSalesFFH'),
+        svName: modal.querySelector('#svNameFFH')
+    };
+
+    // Populate form fields with rowData
+    Object.entries(elements).forEach(([key, element]) => {
+        if (element) {
+            element.textContent = rowData[getRowDataIndex(key)];
+        }
+    });
+
+    const callDisposition = modal.querySelector('#callDisposition');
+    const remarksSection = modal.querySelector('#remarksSection');
+    const remarksLabel = modal.querySelector('#remarksLabel');
+    const zviqRemarks = modal.querySelector('#zviqRemarks');
+    const flagsSection = modal.querySelector('#page2');
+    const professionalismSection = modal.querySelector('#page3');
+    const submitButton = modal.querySelector('.submitFFH');
+    const clearButton = modal.querySelector('.clearFFH');
+    const evalForm = modal.querySelector('#evalFormFFH');
+
+    // Initially hide the buttons
+    submitButton.style.display = 'none';
+    clearButton.style.display = 'none';
+
+    // Function to update form visibility based on disposition
+    function updateFormVisibility(disposition) {
+        remarksSection.style.display = 'none';
+        zviqRemarks.style.display = 'none';
+        flagsSection.style.display = 'none';
+        professionalismSection.style.display = 'none';
+
+        if (disposition.startsWith('Good Sale')) {
+            remarksSection.style.display = 'block';
+        } else if (disposition.includes('Fall-out') || disposition.includes('Error Correction')) {
+            if (disposition === 'Fall-out Potential - Professionalism Issue') {
+                flagsSection.style.display = 'block';
+                professionalismSection.style.display = 'block';
+                zviqRemarks.style.display = 'block';
+            } else {
+                flagsSection.style.display = 'block';
+                zviqRemarks.style.display = 'block';
+            }
+        }
+    }
+
+    // Populate form with existing data if available
+    if (existingData) {
+        callDisposition.value = existingData.callDisposition || '';
+        modal.querySelector('#zviqEvalID').value = existingData.zviqEvalID || '';
+        
+        console.log('Good Sale Remarks:', existingData.goodSaleRemarks);
+        console.log('PROF/FLAG Remarks:', existingData.profFlagRemarks);
+        
+        modal.querySelector('#goodSaleRemarks').value = existingData.goodSaleRemarks || '';
+        modal.querySelector('#flagRemarks').value = existingData.profFlagRemarks || '';
+
+        // Set checkboxes based on existingData (including professionalism)
+        if (existingData.selectedFlags) {
+            for (let category in existingData.selectedFlags) {
+                existingData.selectedFlags[category].forEach(flag => {
+                    const checkbox = modal.querySelector(`input[name="flags"][value="${flag}"], input[name="professionalism"][value="${flag}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+        }
+
+        // Update form visibility based on existing call disposition
+        updateFormVisibility(existingData.callDisposition);
+
+        // Show buttons if there's existing data
+        if (existingData.callDisposition && existingData.callDisposition !== '--Select Disposition--') {
+            submitButton.style.display = 'inline';
+            clearButton.style.display = 'inline';
+            // Automatically show summary for existing evaluations
+            setTimeout(() => {
+                showSummaryFFH({
+                    callDisposition: existingData.callDisposition,
+                    zviqEvalID: existingData.zviqEvalID,
+                    selectedFlags: existingData.selectedFlags,
+                    profFlagRemarks: existingData.profFlagRemarks,
+                    goodSaleRemarks: existingData.goodSaleRemarks
+                }, modal, updateFormVisibility);
+            }, 100);
+        }
+    } else {
+        // If no existing data, reset the form
+        evalForm.reset();
+        updateFormVisibility('');
+    }
+
+    // Event listener for Call Disposition changes
+    callDisposition.addEventListener('change', function () {
+        const disposition = this.value ? this.value.toString() : '';
+        
+        // Only clear fields if this is a manual change (not when populating existing data)
+        if (!existingData || existingData.callDisposition !== disposition) {
+            // Clear all checkboxes when disposition changes
+            modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Clear remarks fields
+            modal.querySelector('#goodSaleRemarks').value = '';
+            modal.querySelector('#flagRemarks').value = '';
+        }
+        
+        updateFormVisibility(disposition);
+
+        // Remove 'required' attribute from ZVIQ Eval ID by default
+        const zviqEvalIDInput = modal.querySelector('#zviqEvalID');
+        if (zviqEvalIDInput) {
+            zviqEvalIDInput.removeAttribute('required');
+            zviqEvalIDInput.value = ''; // Clear ZVIQ Eval ID field
+        }
+
+        // Show/hide buttons and fields based on disposition choice
+        if (disposition === '' || disposition === '--Select Disposition--') {
+            submitButton.style.display = 'none';
+            clearButton.style.display = 'none';
+        } else {
+            submitButton.style.display = 'inline';
+            clearButton.style.display = 'inline';
+
+            if (disposition.indexOf('Good Sale') === 0) {
+                remarksLabel.textContent = `Remarks: Why is it a ${disposition}?`;
+            } else if (disposition.indexOf('Fall-out') !== -1 || disposition.indexOf('Error Correction') !== -1) {
+                if (zviqEvalIDInput) zviqEvalIDInput.setAttribute('required', 'required');
+            }
+        }
+    });
+
+    // Form submission logic
+    evalForm.onsubmit = function(event) {
+        event.preventDefault();
+        showEvalFormLoader();
+        const formData = collectFormDataFFH(modal, elements, callDisposition);
+        console.log('Form Data being submitted:', formData);
+        formData.uniqueId = uniqueId;  // Add uniqueId to formData
+        
+        // Save form data
+        google.script.run.withSuccessHandler(function() {
+            hideEvalFormLoader();
+            showSummaryFFH(formData, modal, updateFormVisibility);
+        }).withFailureHandler(function(error) {
+            hideEvalFormLoader();
+            console.error('Error saving form data:', error);
+            alert('An error occurred while saving the form. Please try again.');
+        }).saveFormData('FFH', uniqueId, formData);
+
+        // Update Eval Form Submission
+        google.script.run.withSuccessHandler(function() {
+            console.log('FFH eval form submission updated successfully');
+        }).withFailureHandler(function(error) {
+            console.error('Error updating FFH eval form submission:', error);
+        }).updateEvalFormSubmissionFFH(formData);
+    };
+
+    // Clear button logic
+clearButton.onclick = function() {
+    resetFormFFH(modal);
+    
+    // Clear data in Google Sheet
+    google.script.run.withSuccessHandler(function(response) {
+        console.log(response);
+        // Refresh the table data
+        loadSalesDataFFH();
+        // Reset the form fields
+        callDisposition.value = '';
+        modal.querySelector('#zviqEvalID').value = '';
+        modal.querySelector('#goodSaleRemarks').value = '';
+        modal.querySelector('#flagRemarks').value = '';
+        updateFormVisibility('');
+        
+        // Hide submit and clear buttons
+        submitButton.style.display = 'none';
+        clearButton.style.display = 'none';
+        
+        // Uncheck all checkboxes
+        modal.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    }).clearEvalFormData(uniqueId, 'FFH');
+
+    // Clear saved form data
+    google.script.run.saveFormData('FFH', uniqueId, {});
+};
+
+    // Modify the close button logic
+    const closeButtons = modal.querySelectorAll('.close, .close-summary');
+    closeButtons.forEach(button => {
+        button.onclick = function() {
+            resetFormFFH(modal);
+            modal.style.display = 'none';
+        };
+    });
+
+    // Select existing close buttons
+const closeIcon = modal.querySelectorAll('.close, .closeModal');
+closeIcon.forEach(icon => {
+    icon.onclick = function() {
+        resetFormFFH(modal);
+        modal.style.display = 'none';
+    };
+});
+}
+
+function collectFormDataFFH(modal, elements, callDisposition) {
+    const selectedFlags = {
+        "Regulatory": [],
+        "Privacy": [],
+        "Price Information": [],
+        "Plan Information": [],
+        "Order Processing": [],
+        "Account Documentation": [],
+        "Call Summary": [],
+        "Customer Experience": [],
+        "Business Intelligence": [],
+        "Marketing Objectives": [],
+        "Professionalism": []
+    };
+
+    // Collect selected flags
+    modal.querySelectorAll('input[name="flags"]:checked').forEach(flag => {
+        for (let section in sectionMappingFFH) {
+            if (sectionMappingFFH[section].includes(flag.value)) {
+                selectedFlags[section].push(flag.value);
+            }
+        }
+    });
+
+    // Collect professionalism flags separately
+    modal.querySelectorAll('input[name="professionalism"]:checked').forEach(flag => {
+        selectedFlags["Professionalism"].push(flag.value);
+    });
+
+    return {
+        svName: elements.svName.textContent,
+        dateValidated: elements.dateValidated.textContent,
+        saleDate: elements.saleDate.textContent,
+        xID: elements.xID.textContent,
+        agentName: elements.agentName.textContent,
+        ban: elements.ban.textContent,
+        phoneNumber: elements.phoneNumber.textContent,
+        soldBAN: elements.soldBAN.textContent,
+        soldPhone: elements.soldPhone.textContent,
+        cssPortfolio: elements.cssPortfolio.textContent,
+        productID: elements.productID.textContent,
+        orderID: elements.orderID.textContent,
+        dueDate: elements.dueDate.textContent,
+        multipleSales: elements.multipleSales.textContent,
+        numberOfSales: elements.numberOfSales.textContent,
+        callDisposition: callDisposition.value,
+        zviqEvalID: modal.querySelector('#zviqEvalID') ? modal.querySelector('#zviqEvalID').value : '',
+        selectedFlags: selectedFlags,
+        profFlagRemarks: (!callDisposition.value.startsWith('Good Sale')) ? modal.querySelector('#flagRemarks').value : '',
+        goodSaleRemarks: (callDisposition.value.startsWith('Good Sale')) ? modal.querySelector('#goodSaleRemarks').value : ''
+    };
+}
+
+function showSummaryFFH(formData, modal, updateFormVisibility) {
+    // Hide other form pages but show page1 with disposition and remarks
+    const page2 = modal.querySelector('#page2');
+    const page3 = modal.querySelector('#page3');
+    const zviqRemarks = modal.querySelector('#zviqRemarks');
+    
+    if (page2) page2.style.display = 'none';
+    if (page3) page3.style.display = 'none';
+    if (zviqRemarks) zviqRemarks.style.display = 'none';
+    
+    // Show page1 and remarks section
+    const page1 = modal.querySelector('#page1');
+    const remarksSection = modal.querySelector('#remarksSection');
+    
+    if (page1) page1.style.display = 'block';
+    if (remarksSection) remarksSection.style.display = 'block';
+    
+    // Set the call disposition dropdown
+    const callDisposition = modal.querySelector('#callDisposition');
+    if (callDisposition) {
+        callDisposition.value = formData.callDisposition;
+    }
+    
+    // Set the remarks textarea
+    const remarksTextarea = formData.callDisposition.startsWith('Good Sale') ? 
+        modal.querySelector('#goodSaleRemarks') : modal.querySelector('#flagRemarks');
+    if (remarksTextarea) {
+        remarksTextarea.value = formData.callDisposition.startsWith('Good Sale') ? 
+            (formData.goodSaleRemarks || '') : (formData.profFlagRemarks || '');
+    }
+    
+    // Show submit and clear buttons
+    const submitButton = modal.querySelector('.submitFFH');
+    const clearButton = modal.querySelector('.clearFFH');
+    if (submitButton) submitButton.style.display = 'inline';
+    if (clearButton) clearButton.style.display = 'inline';
+}
+
+// Helper function to get the correct index from rowData (same as WLS)
+function getRowDataIndex(key) {
+    const indexMap = {
+        dateValidated: 2,
+        saleDate: 3,
+        xID: 4,
+        agentName: 15,
+        ban: 5,
+        phoneNumber: 6,
+        soldBAN: 7,
+        soldPhone: 8,
+        cssPortfolio: 9,
+        productID: 10,
+        orderID: 11,
+        dueDate: 12,
+        multipleSales: 13,
+        numberOfSales: 14,
+        svName: 1
+    };
+    return indexMap[key] || 0;
+}
+// Lazy loading functions
+function renderBatchWLS(data, filteredIds, tableBody) {
+    const fragment = document.createDocumentFragment();
+    const start = currentBatch * ROWS_PER_BATCH;
+    const end = Math.min(start + ROWS_PER_BATCH, data.length);
+    
+    for (let index = start; index < end; index++) {
+        const row = data[index];
+        const uniqueId = filteredIds[index];
+        const tr = createRowWLS(row, uniqueId, index);
+        fragment.appendChild(tr);
+    }
+    
+    tableBody.appendChild(fragment);
+    currentBatch++;
+}
+
+function createRowWLS(row, uniqueId, index) {
+    const tr = document.createElement('tr');
+    tr.dataset.uniqueId = uniqueId;
+    
+    // Status cell
+    const statusTd = document.createElement('td');
+    statusTd.textContent = row[0] || '';
+    applyStatusColor(statusTd, row[0] || '');
+    tr.appendChild(statusTd);
+    
+    row.forEach((cell, colIndex) => {
+        if (colIndex !== 0 && colIndex !== 11 && colIndex !== 12) {
+            const td = document.createElement('td');
+            
+            if (colIndex === 1) {
+                td.appendChild(createSVNameDropdown(cell, uniqueId, row));
+            } else if (colIndex === 2) {
+                td.appendChild(createDateValidatedInput(cell, uniqueId, row));
+            } else {
+                td.textContent = cell || '';
+            }
+            
+            tr.appendChild(td);
+        }
+    });
+    
+    // Action button
+    const actionTd = document.createElement('td');
+    const actionButton = document.createElement('button');
+    actionButton.textContent = 'Open Eval Form';
+    actionButton.className = 'eval-form-button';
+    updateButtonState(actionButton, row[1], row[2]);
+    actionButton.addEventListener('click', () => openFormWLS(row));
+    actionTd.appendChild(actionButton);
+    tr.appendChild(actionTd);
+    
+    return tr;
+}
+
+function lazyLoadWLS(data, filteredIds, tableBody) {
+    if (isLoading || currentBatch * ROWS_PER_BATCH >= data.length) return;
+    
+    const container = tableBody.closest('.table-container') || window;
+    const scrollTop = container.scrollTop || window.pageYOffset;
+    const scrollHeight = container.scrollHeight || document.body.scrollHeight;
+    const clientHeight = container.clientHeight || window.innerHeight;
+    
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+        isLoading = true;
+        setTimeout(() => {
+            renderBatchWLS(data, filteredIds, tableBody);
+            isLoading = false;
+        }, 100);
+    }
+}
+
+// FFH Lazy loading functions
+function renderBatchFFH(data, filteredIds, tableBody) {
+    const fragment = document.createDocumentFragment();
+    const start = currentBatch * ROWS_PER_BATCH;
+    const end = Math.min(start + ROWS_PER_BATCH, data.length);
+    
+    for (let index = start; index < end; index++) {
+        const row = data[index];
+        const uniqueId = filteredIds[index];
+        const tr = createRowFFH(row, uniqueId, index);
+        fragment.appendChild(tr);
+    }
+    
+    tableBody.appendChild(fragment);
+    currentBatch++;
+}
+
+function createRowFFH(row, uniqueId, index) {
+    const tr = document.createElement('tr');
+    tr.dataset.uniqueId = uniqueId;
+    
+    row.forEach((cell, colIndex) => {
+        if (colIndex !== 11 && colIndex !== 12) {
+            const td = document.createElement('td');
+            
+            if (colIndex === 0) {
+                td.textContent = cell || '';
+                applyStatusColor(td, cell || '');
+            } else if (colIndex === 2) {
+                td.appendChild(createDateValidatedInputFFH(cell, uniqueId, row));
+            } else {
+                td.textContent = cell || '';
+            }
+            
+            tr.appendChild(td);
+        }
+    });
+    
+    // Action button
+    const actionTd = document.createElement('td');
+    const actionButton = document.createElement('button');
+    actionButton.textContent = 'Open Eval Form';
+    actionButton.className = 'eval-form-button';
+    actionButton.disabled = !row[2];
+    actionButton.addEventListener('click', () => openFormFFH(row));
+    actionTd.appendChild(actionButton);
+    tr.appendChild(actionTd);
+    
+    return tr;
+}
+
+function lazyLoadFFH(data, filteredIds, tableBody) {
+    if (isLoading || currentBatch * ROWS_PER_BATCH >= data.length) return;
+    
+    const container = tableBody.closest('.table-container') || window;
+    const scrollTop = container.scrollTop || window.pageYOffset;
+    const scrollHeight = container.scrollHeight || document.body.scrollHeight;
+    const clientHeight = container.clientHeight || window.innerHeight;
+    
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+        isLoading = true;
+        setTimeout(() => {
+            renderBatchFFH(data, filteredIds, tableBody);
+            isLoading = false;
+        }, 100);
+    }
+}
+
+// End of FFH Modal Form code
+</script>
+</body>
+</html>
